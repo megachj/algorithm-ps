@@ -4,13 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Pick {
+public class BruteForce {
 
     private static List<String> valueList;
 
     public static void main(String[] args) {
         valueList = Arrays.asList("a", "b", "c", "d");
-        pick(4, new ArrayList<>(), 2);
+        combination(4, new ArrayList<>(), 2);
+    }
+
+    // TODO
+    /**
+     *
+     */
+    public static void permutation() {
+
     }
 
     /**
@@ -20,7 +28,7 @@ public class Pick {
      * @param picked: 지금까지 고른 원소들의 번호
      * @param toPick: 더 고를 원소의 수
      */
-    public static void pick(int n, List<Integer> picked, int toPick) {
+    public static void combination(int n, List<Integer> picked, int toPick) {
         // 기저 사례: 더 고를 원소가 없을 때 고른 원소들을 출력한다.
         if (toPick == 0) {
             picked.forEach(idx -> {
@@ -36,8 +44,16 @@ public class Pick {
         // 이 단계에서 원소 하나를 고른다.
         for (int next = smallestIdx; next < n; ++next) {
             picked.add(next);
-            pick(n, picked, toPick - 1);
+            combination(n, picked, toPick - 1);
             picked.remove(picked.size()-1);
         }
+    }
+
+    // TODO
+    /**
+     *
+     */
+    public static void searchAllCase() {
+
     }
 }

@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 /**
  * https://www.algospot.com/judge/problem/read/BOGGLE
+ *
+ * 난이도: 하
  */
 public class BOGGLE {
     public static void main(String[] args) {
@@ -27,7 +29,7 @@ public class BOGGLE {
                 results.add(new Result(scanner.nextLine()));
             }
 
-
+            // TODO
         }
     }
 
