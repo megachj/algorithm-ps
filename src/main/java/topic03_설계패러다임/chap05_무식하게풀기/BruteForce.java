@@ -1,4 +1,4 @@
-package topic03_설계패러다임.chap05_무식하게풀기.example;
+package topic03_설계패러다임.chap05_무식하게풀기;
 
 import java.util.ArrayList;
 import java.util.Arrays;
