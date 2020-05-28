@@ -7,11 +7,42 @@ import java.util.StringTokenizer;
 
 public class IOUsage {
     public static void main(String[] args) throws Exception {
-        // input_Scanner_usage();
         // input_BufferedReader_usage();
+        // input_Scanner_usage();
         // input_StringTokenizer_usage();
         // output_SystemOut_usage();
         // output_StringBuilder_usage();
+    }
+
+    /**
+     * NOTE: 가장 추천하는 입력 방식
+     *
+     * BufferedReader 는 문자열로만 입력 가능. 하지만 속도가 빠르므로 입력이 많은 경우에 사용하자.
+     * 문자열로만 입력 받으므로 적절히 파싱이 필요하다.
+     */
+    private static void input_BufferedReader_usage() throws Exception {
+        System.out.println("----- input_BufferedReader_usage -----");
+
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        String[] words;
+
+        // 문자열을 읽는다. '\n' 는 포함하지 않음.
+        System.out.print("문자열을 입력해주세요: ");
+        line = bf.readLine();
+        System.out.printf("[%s]\n", line);
+
+        // 입력: 숫자 1개
+        System.out.print("N 입력(정수): ");
+        int N = Integer.parseInt(bf.readLine());
+
+        // 입력: 숫자 N개
+        int[] numbers = new int[N];
+        System.out.println("정수 N개 입력: ");
+        words = bf.readLine().split(" ");
+        for (int i = 0; i < N; ++i) {
+            numbers[i] = Integer.parseInt(words[i]);
+        }
     }
 
     /**
@@ -41,28 +72,6 @@ public class IOUsage {
             sum += scanner.nextInt();
         }
         System.out.printf("[합계: %d]\n", sum);
-    }
-
-    /**
-     * BufferedReader 는 문자열로만 입력 가능. 하지만 속도가 빠르므로 입력이 많은 경우에 사용하자.
-     * 문자열로만 입력 받으므로 적절히 파싱이 필요하다.
-     */
-    private static void input_BufferedReader_usage() throws Exception {
-        System.out.println("----- input_BufferedReader_usage -----");
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        String line;
-
-        // 문자열을 읽는다. '\n' 는 포함하지 않음.
-        System.out.print("문자열을 입력해주세요: ");
-        line = bf.readLine();
-        System.out.printf("[%s]\n", line);
-
-        System.out.print("네 개의 숫자를 입력해주세요: ");
-        String[] numberArray = bf.readLine().split(" "); // Arrays.asList() 를 이용해 리스트로 사용 가능.
-        String a = numberArray[0] + numberArray[1];
-        String b = numberArray[2] + numberArray[3];
-        long result = Long.parseLong(a) + Long.parseLong(b);
-        System.out.printf("[result: %d]\n", result);
     }
 
     /**
