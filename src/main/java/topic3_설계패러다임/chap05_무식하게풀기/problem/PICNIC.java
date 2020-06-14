@@ -7,6 +7,7 @@ import java.util.Scanner;
  * https://www.algospot.com/judge/problem/read/PICNIC
  *
  * 난이도: 하
+ * 상태:
  */
 public class PICNIC {
     private static ArrayList<Integer> mList;
