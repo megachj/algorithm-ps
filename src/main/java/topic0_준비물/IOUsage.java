@@ -32,14 +32,20 @@ public class IOUsage {
         line = bf.readLine();
         System.out.printf("[%s]\n", line);
 
+        // 문자열 양 옆 공백 제거.
+        // 문자열을 읽는다. '\n' 는 포함하지 않음.
+        System.out.print("문자열을 입력해주세요: ");
+        line = bf.readLine().trim();
+        System.out.printf("[%s]\n", line);
+
         // 입력: 숫자 1개
         System.out.print("N 입력(정수): ");
-        int N = Integer.parseInt(bf.readLine());
+        int N = Integer.parseInt(bf.readLine().trim());
 
         // 입력: 숫자 N개
         int[] numbers = new int[N];
         System.out.println("정수 N개 입력: ");
-        words = bf.readLine().split(" ");
+        words = bf.readLine().trim().split(" ");
         for (int i = 0; i < N; ++i) {
             numbers[i] = Integer.parseInt(words[i]);
         }

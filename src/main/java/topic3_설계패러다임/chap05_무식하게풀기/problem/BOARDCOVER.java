@@ -32,19 +32,19 @@ public class BOARDCOVER {
     );
 
     public static void main(String[] args) throws Exception {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int C = Integer.parseInt(bf.readLine().trim());
+        int C = Integer.parseInt(br.readLine().trim());
         List<Integer> results = new ArrayList<>(C);
 
         for (int c = 0; c < C; ++c) {
-            String[] words = bf.readLine().split(" ");
+            String[] words = br.readLine().split(" ");
             H = Integer.parseInt(words[0]);
             W = Integer.parseInt(words[1]);
 
             board = new char[H][];
             for (int y = 0; y < H; ++y) {
-                String line = bf.readLine().trim();
+                String line = br.readLine().trim();
                 board[y] = line.toCharArray();
             }
 

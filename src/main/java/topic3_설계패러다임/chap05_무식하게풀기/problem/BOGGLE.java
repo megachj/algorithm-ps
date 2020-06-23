@@ -27,20 +27,20 @@ public class BOGGLE {
     public static int[][][] cache = new int[10][5][5];
 
     public static void main(String[] args) throws Exception {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        int C = Integer.parseInt(bf.readLine());
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int C = Integer.parseInt(br.readLine());
         for (int c = 0; c < C; ++c) {
             for (int i = 0; i < 5; ++i) {
-                String line = bf.readLine();
+                String line = br.readLine();
                 board[i] = line.toCharArray();
             }
 
             List<String> results = new ArrayList<>(10);
 
-            int N = Integer.parseInt(bf.readLine());
+            int N = Integer.parseInt(br.readLine());
             for (int n = 0; n < N; ++n) {
                 initialize();
-                String word = bf.readLine();
+                String word = br.readLine();
                 boolean isExist = false;
                 for (int y = 0; y < 5; ++y) {
                     for (int x = 0; x < 5; ++x) {
