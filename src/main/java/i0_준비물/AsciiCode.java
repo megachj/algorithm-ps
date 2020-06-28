@@ -10,5 +10,15 @@ public class AsciiCode {
 
         System.out.printf("char type: %c, %c, %c, %c\n", a, b, A, B);
         System.out.printf("int ascii code: %d, %d, %d, %d\n", (int)a, (int)b, (int)A, (int)B);
+
+        String intLine = "12345";
+        int[] array = new int[intLine.length()];
+        for (int i = 0; i < intLine.length(); ++i) {
+            array[i] = intLine.charAt(i) - '0';
+            System.out.printf("%d ", array[i]);
+        }
+        System.out.println();
+
+        System.out.println('2' - '3');
     }
 }
