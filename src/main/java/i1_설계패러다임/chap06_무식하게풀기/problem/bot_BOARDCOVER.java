@@ -37,7 +37,7 @@ public class bot_BOARDCOVER {
         List<Integer> results = new ArrayList<>(C);
 
         for (int c = 0; c < C; ++c) {
-            String[] words = br.readLine().split(" ");
+            String[] words = br.readLine().split("\\s+");
             H = Integer.parseInt(words[0]);
             W = Integer.parseInt(words[1]);
 

@@ -29,7 +29,7 @@ public class mid_CLOCKSYNC {
         int C = Integer.parseInt(br.readLine().trim());
         List<Integer> resultList = new ArrayList<>(C);
         for (int c = 0; c < C; ++c) {
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             for (int i = 0; i < 16; ++i) {
                 hourArray[i] = Integer.parseInt(input[i]);
             }

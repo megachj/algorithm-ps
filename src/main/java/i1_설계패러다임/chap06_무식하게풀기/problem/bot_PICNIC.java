@@ -27,14 +27,14 @@ public class bot_PICNIC {
         int C = Integer.parseInt(br.readLine().trim());
         results = new ArrayList<>(C);
         for (int c = 0; c < C; ++c) {
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             n = Integer.parseInt(input[0]);
             m = Integer.parseInt(input[1]);
 
             adj = new boolean[n][n];
             matched = new boolean[n];
             init();
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             for (int i = 0; i < m * 2; i += 2) {
                 int u, v;
                 u = Integer.parseInt(input[i]);

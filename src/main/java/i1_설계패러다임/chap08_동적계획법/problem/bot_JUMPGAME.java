@@ -31,7 +31,7 @@ public class bot_JUMPGAME {
             // board 생성
             board = new int[n][n];
             for (int i = 0; i < n; ++i) {
-                String[] input = br.readLine().trim().split(" ");
+                String[] input = br.readLine().trim().split("\\s+");
                 for (int j = 0; j < n; ++j) {
                     board[i][j] = Integer.parseInt(input[j]);
                 }

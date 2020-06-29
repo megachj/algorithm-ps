@@ -28,16 +28,16 @@ public class bot_JLIS {
         for (int c = 0; c < C; ++c) {
             initCache();
 
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             n = Integer.parseInt(input[0]);
             m = Integer.parseInt(input[1]);
 
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             A[0] = Long.MIN_VALUE;
             for (int i = 1; i <= n; ++i)
                 A[i] = Long.parseLong(input[i-1]);
 
-            input = br.readLine().trim().split(" ");
+            input = br.readLine().trim().split("\\s+");
             B[0] = Long.MIN_VALUE;
             for (int i = 1; i <= m; ++i)
                 B[i] = Long.parseLong(input[i-1]);

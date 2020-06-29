@@ -45,7 +45,8 @@ public class IOUsage {
         // 입력: 숫자 N개
         int[] numbers = new int[N];
         System.out.println("정수 N개 입력: ");
-        words = bf.readLine().trim().split(" ");
+        // 아래처럼 \\s+ 로 해야 모든 공백에 대해서 정확히 구분된다. (공백 여러개, 탭 등 포함)
+        words = bf.readLine().trim().split("\\s+"); // split(" ") 이렇게 하면 공백이 1개인 것만 구분되고, 2개 이상인 경우 구분이 오류남.
         for (int i = 0; i < N; ++i) {
             numbers[i] = Integer.parseInt(words[i]);
         }

@@ -21,7 +21,7 @@ public class bot_SNAIL {
         List<Double> results = new ArrayList<>(C);
         for (int c = 0; c < C; ++c) {
             int n, m;
-            String[] input = br.readLine().trim().split(" ");
+            String[] input = br.readLine().trim().split("\\s+");
             n = Integer.parseInt(input[0]);
             m = Integer.parseInt(input[1]);
 

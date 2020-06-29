@@ -29,7 +29,7 @@ public class bot_LIS {
             initCache();
 
             N = Integer.parseInt(br.readLine().trim());
-            A = Arrays.stream(br.readLine().trim().split(" "))
+            A = Arrays.stream(br.readLine().trim().split("\\s+"))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
 
