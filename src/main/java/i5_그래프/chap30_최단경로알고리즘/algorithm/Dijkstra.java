@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Dijkstra {
 
-    private static final int MAX_V = 30;
-
     private final int V; // 정점의 개수
     private final List<List<Pair<Integer, Integer>>> adj; // 그래프 인접 리스트 (연결된 정점 번호, 간선 가중치) 쌍
 
@@ -102,5 +100,4 @@ public class Dijkstra {
 
         return dist;
     }
-
 }
