@@ -1,6 +1,6 @@
 plugins {
-    // kotlin("jvm")
-    id("java")
+    kotlin("jvm")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 group = "sunset.algorithm"
@@ -10,13 +10,15 @@ repositories {
     mavenCentral()
 }
 
+apply {
+    plugin("idea")
+    plugin("kotlin")
+}
+
 dependencies {
-//    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.test {
     useJUnitPlatform()
 }
-//kotlin {
-//    jvmToolchain(11)
-//}
