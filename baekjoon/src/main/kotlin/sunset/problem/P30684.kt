@@ -1,4 +1,4 @@
-package sunset.sunset.problem
+package sunset.problem
 
 /**
  * https://www.acmicpc.net/problem/30684

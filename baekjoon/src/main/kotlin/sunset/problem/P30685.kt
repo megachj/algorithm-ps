@@ -1,4 +1,4 @@
-package sunset.sunset.problem
+package sunset.problem
 
 import kotlin.math.max
 import kotlin.math.min
