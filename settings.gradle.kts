@@ -24,6 +24,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "algorithm"
+rootProject.name = "algorithm-ps"
 include("algospot")
 include("baekjoon")
