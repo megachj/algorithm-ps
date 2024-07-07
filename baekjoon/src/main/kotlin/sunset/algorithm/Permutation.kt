@@ -4,13 +4,13 @@ fun main(args: Array<String>) {
     println("순열 리스트 예제")
     val permutationListGenerator = PermutationListGenerator(setOf(0, 1, 2))
     for (e in permutationListGenerator.createPermutationList(3)) {
-        println("${e}")
+        println("$e")
     }
 
     println("순열 시퀀스 예제")
     val permutationSequenceGenerator = PermutationSequenceGenerator(setOf(0, 1, 2))
     for (e in permutationSequenceGenerator.createPermutationSequence(2)) {
-        println("${e}")
+        println("$e")
     }
 }
 
@@ -59,7 +59,7 @@ class PermutationListGenerator<T : Any>(
     )
 }
 
-class PermutationSequenceGenerator<T: Any>(
+class PermutationSequenceGenerator<T : Any>(
     private val elements: Set<T>
 ) {
     /**

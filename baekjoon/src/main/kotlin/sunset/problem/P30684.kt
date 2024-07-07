@@ -17,9 +17,9 @@ fun main(args: Array<String>) {
 fun getChairman(name1: String, name2: String): String {
     if (name1.length != 3 && name2.length != 3)
         return "z"
-    else if(name1.length == 3 && name2.length != 3)
+    else if (name1.length == 3 && name2.length != 3)
         return name1
-    else if(name1.length != 3 && name2.length == 3)
+    else if (name1.length != 3 && name2.length == 3)
         return name2
 
     val compareTo = name1.compareTo(name2)

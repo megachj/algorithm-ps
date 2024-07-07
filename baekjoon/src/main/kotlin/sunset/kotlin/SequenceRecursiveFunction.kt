@@ -22,5 +22,5 @@ private suspend fun SequenceScope<Int>.recursivelyDecrease(n: Int) {
     }
 
     yield(n)
-    recursivelyDecrease(n-1)
+    recursivelyDecrease(n - 1)
 }
