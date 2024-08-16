@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
 
     // O(n) -> 30만
     val positions: MutableList<Position> = mutableListOf()
-    for (i in 0 ..n-1) {
+    for (i in 0..n - 1) {
         positions.add(Position(readln().split(" ")))
     }
     // O(nlgn) -> 545만
@@ -20,8 +20,8 @@ fun main(args: Array<String>) {
 
     // O(n) -> 30만
     var result: Int = Int.MAX_VALUE
-    for (i in 0..n-2) {
-        result = min(result, getResult(positions[i], positions[i+1]))
+    for (i in 0..n - 2) {
+        result = min(result, getResult(positions[i], positions[i + 1]))
     }
 
     if (result == Int.MAX_VALUE) {
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
 }
 
 private fun getResult(pos1: Position, pos2: Position): Int {
-    val distance:Int = pos2.x - pos1.x - 1
+    val distance: Int = pos2.x - pos1.x - 1
     val cnt2 = min(pos1.dis, pos2.dis)
     val cnt1 = max(pos1.dis, pos2.dis) - cnt2
 
@@ -57,5 +57,5 @@ data class Position(
     constructor(inputs: List<String>) : this(inputs[0].toInt(), inputs[1].toInt())
 
     val dis: Int
-        get() = (h-1)/2
+        get() = (h - 1) / 2
 }
