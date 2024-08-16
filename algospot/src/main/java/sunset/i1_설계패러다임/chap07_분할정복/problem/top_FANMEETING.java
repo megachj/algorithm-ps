@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 /**
  * https://www.algospot.com/judge/problem/read/FANMEETING
  *
- * 상태:
+ * 상태: 포기
  */
 public class top_FANMEETING {
 
@@ -18,7 +18,6 @@ public class top_FANMEETING {
         inputProblem();
 
         for (int i = 0; i < FANS.length; ++i) {
-            solveUnitProblem(i);
         }
     }
 
@@ -32,9 +31,5 @@ public class top_FANMEETING {
             MEMBERS[i] = br.readLine();
             FANS[i] = br.readLine();
         }
-    }
-
-    private static void solveUnitProblem(int c) throws Exception {
-        for()
     }
 }
