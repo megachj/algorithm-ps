@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class p42577 {
 
     public static void main(String[] args) {
-
+        Solution solution = new Solution();
     }
 }
 
