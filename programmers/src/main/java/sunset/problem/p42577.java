@@ -1,9 +1,6 @@
 package sunset.problem;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @see <a href="https://school.programmers.co.kr/learn/courses/30/lessons/42577?language=java">문제</a>
