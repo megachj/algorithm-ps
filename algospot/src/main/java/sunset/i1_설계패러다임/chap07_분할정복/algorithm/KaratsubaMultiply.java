@@ -18,11 +18,11 @@ public class KaratsubaMultiply {
 
     /**
      * 카라츠바 빠른곱셈 알고리즘으로 a * b 연산을 한다.<br>
-     * 시간 복잡도: O(밑이 n인 lg3 거듭제곱 = n^(lg3))<br>
+     * 시간 복잡도: O(n^(lg3))<br>
      *
-     * @param aNumber
-     * @param bNumber
-     * @return
+     * @param aNumber 정수 문자열
+     * @param bNumber 정수 문자열
+     * @return 곱셉 결과 문자열
      */
     public static String multiply(String aNumber, String bNumber) {
         if (aNumber == null || bNumber == null || aNumber.isEmpty() || bNumber.isEmpty()) {
@@ -258,9 +258,6 @@ public class KaratsubaMultiply {
             result[i] = 0;
         }
         System.arraycopy(a, 0, result, decimalExp + 0, a.length);
-//        for (int i = 0; i < a.length; i++) {
-//            result[decimalExp + i] = a[i];
-//        }
 
         return trimBytes(result);
     }
