@@ -1,5 +1,13 @@
 package sunset.problem;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * @see <a href="https://school.programmers.co.kr/learn/courses/30/lessons/42577?language=java">문제</a>
+ */
 public class p42577 {
 
     public static void main(String[] args) {
@@ -17,6 +25,12 @@ class Solution {
      * @return 접두어 전화번호 존재 여부(존재: false, 비존재: true)
      */
     public boolean solution(String[] phone_book) {
-
+        Arrays.sort(phone_book);
+        for (int i = 0; i < phone_book.length - 1; i++) {
+            if (phone_book[i+1].startsWith(phone_book[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
