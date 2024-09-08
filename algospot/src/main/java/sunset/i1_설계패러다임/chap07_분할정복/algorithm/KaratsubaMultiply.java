@@ -71,6 +71,32 @@ public class KaratsubaMultiply {
         private final byte[] aNumber;
         private final byte[] bNumber;
 
+        private String toString(byte[] byteArray) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < byteArray.length; i++) {
+                sb.append(byteArray[i]);
+                if (i != byteArray.length - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
+        private String toString(byte[] byteArray, int startIdx, int endIdx) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = startIdx; i <= endIdx; i++) {
+                sb.append(byteArray[i]);
+                if (i != endIdx) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
         public Solution(byte[] aNumber, byte[] bNumber) {
             if (aNumber == null || bNumber == null || aNumber.length == 0) {
                 throw new IllegalArgumentException("파라미터가 이상합니다.");
@@ -100,23 +126,29 @@ public class KaratsubaMultiply {
          * @return
          */
         private byte[] multiplyKaratsuba(int startIdx, int endIdx) {
+            System.out.printf("카라츠바 시작: a%s * b%s\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx));
             int middleIdx;
             try {
                 middleIdx = findMiddleIndex(startIdx, endIdx);
             } catch (RuntimeException e) {
                 // 자를 수 없을 때
-                return new byte[]{(byte) (aNumber[startIdx] * bNumber[startIdx])};
+                byte[] result = new byte[]{(byte) (aNumber[startIdx] * bNumber[startIdx])};
+                System.out.printf("카라츠바 끝: a%s * b%s = %s\n\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx), toString(result));
+                return result;
             }
 
             // z0 = a0 * b0
             byte[] z0 = multiplyKaratsuba(startIdx, middleIdx);
+            System.out.printf("z0 = a0%s * b0%s = %s\n", toString(aNumber, startIdx, middleIdx), toString(bNumber, startIdx, middleIdx), toString(z0));
             // z2 = a1 * b1
             byte[] z2 = multiplyKaratsuba(middleIdx + 1, endIdx);
+            System.out.printf("z2 = a1%s * b1%s = %s\n", toString(aNumber, middleIdx + 1, endIdx), toString(bNumber, middleIdx + 1, endIdx), toString(z2));
             // z1 = (a0 + a1) * (b0 + b1) - z0 - z2 = a1*b0 + a0*b1
             byte[] z1 = calculateZ1(startIdx, middleIdx, endIdx, z0, z2);
+            System.out.printf("z1 = (a0%s + a1%s) * (b0%s + b1%s) - z0 - z2 = %s\n", toString(aNumber, startIdx, middleIdx), toString(aNumber, middleIdx + 1, endIdx), toString(bNumber, startIdx, middleIdx), toString(bNumber, middleIdx + 1, endIdx), toString(z1));
 
             // result
-            return mergeResult(z0, z1, z2, endIdx - startIdx + 1);
+            return mergeResult(z0, z1, z2, startIdx, endIdx);
         }
 
         private int findMiddleIndex(int startIdx, int endIdx) {
@@ -133,22 +165,32 @@ public class KaratsubaMultiply {
             byte[] a0 = copy(aNumber, startIdx, middleIdx);
             byte[] b1 = copy(bNumber, middleIdx + 1, endIdx);
             byte[] b0 = copy(bNumber, startIdx, middleIdx);
+            System.out.printf("a1 = %s, a0 = %s, b1 = %s, b0 = %s\n", toString(a1), toString(a0), toString(b1), toString(b0));
 
             byte[] a1AddA0 = add(a1, a0);
+            System.out.printf("a1 + a0 = %s\n", toString(a1AddA0));
             byte[] b1AddB0 = add(b1, b0);
+            System.out.printf("b1 + b0 = %s\n", toString(b1AddB0));
 
             Solution solution = new Solution(a1AddA0, b1AddB0); // 길이 같게 해줘야함.
-            byte[] z1 = solution.solve();
+            byte[] a1a0b1b0 = solution.solve();
+            byte[] midResult = sub(a1a0b1b0, z0);
+            byte[] z1 = sub(midResult, z2);
+            System.out.printf("z1 = %s\n", toString(z1));
 
-            byte[] result = sub(z1, z0);
-            return sub(result, z2);
+            return z1;
         }
 
-        private byte[] mergeResult(byte[] z0, byte[] z1, byte[] z2, int n) {
+        private byte[] mergeResult(byte[] z0, byte[] z1, byte[] z2, int startIdx, int endIdx) {
+            int n = endIdx - startIdx + 1;
+
             byte[] z2Pow = pow10(z2, n);
+            System.out.printf("z2(10^%d) = %s\n", n, toString(z2Pow));
             byte[] z1Pow = pow10(z1, n / 2);
+            System.out.printf("z1(10^%d) = %s\n", n/2, toString(z1Pow));
             byte[] result = add(z2Pow, z1Pow);
             result = add(result, z0);
+            System.out.printf("카라츠바 끝: a%s * b%s = z2Pow%s + z1Pow%s + z0%s = %s\n\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx), toString(z2Pow), toString(z1Pow), toString(z0), toString(result));
 
             return result;
         }
@@ -184,10 +226,17 @@ public class KaratsubaMultiply {
                 carry = sum / 10;
             }
             result[n] = (byte) carry;
-            if (result[n] == 0) {
-                byte[] newResult = new byte[n];
-                System.arraycopy(result, 0, newResult, 0, n);
-                return newResult;
+
+            for (int i = n; i >= 0; i--) {
+                if (result[i] != 0) {
+                    if (i == n) {
+                        return result;
+                    } else {
+                        byte[] newResult = new byte[i + 1];
+                        System.arraycopy(result, 0, newResult, 0, i + 1);
+                        return newResult;
+                    }
+                }
             }
             return result;
         }
@@ -222,4 +271,6 @@ public class KaratsubaMultiply {
             return result;
         }
     }
+
+
 }
