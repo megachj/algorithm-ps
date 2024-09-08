@@ -1,56 +1,43 @@
 package sunset.i1_설계패러다임.chap07_분할정복.algorithm;
 
-import sunset.library.DividableRange;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+/**
+ * @see <a href="https://www.acmicpc.net/problem/13277">문제</a>
+ */
 public class KaratsubaMultiply {
+
+    // 테스트 케이스
+    // 1 1 = 1
+    // 11 11 = 121
+    // 123 1 = 123
+    // 1 123 = 123
+    // 123 12 = 1476
+    // 12 123 = 1476
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String a = br.readLine();
-        String b = br.readLine();
+        String[] input = br.readLine().split(" ");
+        String aNumberString = input[0];
+        String bNumberString = input[1];
+        int maxLength = Math.max(aNumberString.length(), bNumberString.length());
 
-        String result = multiply(a, b);
-        System.out.printf("%s * %s = %s\n", a, b, result);
+        byte[] aNumber = numberStringToByteArrayWithZeroPadding(aNumberString, maxLength);
+        byte[] bNumber = numberStringToByteArrayWithZeroPadding(bNumberString, maxLength);
+
+        Solution solution = new Solution(aNumber, bNumber);
+        printByteArray(solution.solve());
     }
 
     /**
-     * 카라츠바 빠른곱셈 알고리즘으로 a * b 연산을 한다.<br>
-     * 시간 복잡도: O(n^(lg3))<br>
+     * 숫자 문자열을 n 사이즈인 byte 배열로 변환한다. 사이즈가 부족할 경우 0으로 채운다.
      *
-     * @param aNumber 정수 문자열
-     * @param bNumber 정수 문자열
-     * @return 곱셉 결과 문자열
+     * @param numberString  변환할 숫자 문자열
+     * @param n             byte 배열의 사이즈
+     * @return 변환된 byte 배열
      */
-    public static String multiply(String aNumber, String bNumber) {
-        if (aNumber == null || bNumber == null || aNumber.isEmpty() || bNumber.isEmpty()) {
-            throw new IllegalArgumentException("파라미터가 이상합니다.");
-        }
-
-        int n = Math.max(aNumber.length(), bNumber.length());
-        byte[] a = numberStringToByteArray(aNumber, n);
-        byte[] b = numberStringToByteArray(bNumber, n);
-
-        byte[] result;
-        if (isGreaterOrEqual(a, b)) {
-            result = solveDivideConquer(a, DividableRange.of(0, n), b, DividableRange.of(0, n));
-        } else {
-            result = solveDivideConquer(b, DividableRange.of(0, n), a, DividableRange.of(0, n));
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = result.length - 1; i >= 0; i--) {
-            stringBuilder.append(result[i]);
-        }
-        return stringBuilder.toString();
-    }
-
-    /**
-     * 숫자 문자열을 n 사이즈인 byte 배열로 변환한다.
-     */
-    private static byte[] numberStringToByteArray(String numberString, int n) {
+    private static byte[] numberStringToByteArrayWithZeroPadding(String numberString, int n) {
         // 문자열의 길이만큼의 byte 배열 생성
         byte[] byteArray = new byte[n];
 
@@ -59,229 +46,180 @@ public class KaratsubaMultiply {
         for (int i = 0; i < numberLength; i++) {
             byteArray[i] = (byte) (numberString.charAt(numberLength - i - 1) - '0');
         }
+        // 나머지는 0으로 채운다.
+        for (int i = numberLength; i < n; i++) {
+            byteArray[i] = 0;
+        }
 
         return byteArray;
     }
 
     /**
-     * a >= b 인지 확인한다.
+     * byte 배열을 출력한다.
+     *
+     * @param byteArray
      */
-    private static boolean isGreaterOrEqual(byte[] a, byte[] b) {
-        for (int i = a.length - 1; i >= 0; i--) {
-            if (a[i] > b[i]) {
-                return true;
-            }
-            if (a[i] < b[i]) {
-                return false;
-            }
+    private static void printByteArray(byte[] byteArray) {
+        for (int i = byteArray.length - 1; i >= 0; i--) {
+            System.out.print(byteArray[i]);
         }
-        return true;
+        System.out.println();
     }
 
-    /**
-     * a >= b 임을 가정하고 a * b 연산을 한다.(재귀)
-     */
-    private static byte[] solveDivideConquer(
-            byte[] a, DividableRange aRange, byte[] b, DividableRange bRange
-    ) {
-        boolean aRangeDividable = aRange.isDividable();
+    static class Solution {
 
-        // 쪼개지는 경우
-        if (aRangeDividable) {
-            DividableRange a1Range = aRange.getDividedRight();
-            DividableRange a0Range = bRange.getDividedLeft();
+        private final byte[] aNumber;
+        private final byte[] bNumber;
 
-            DividableRange b1Range = bRange.getDividedRight();
-            DividableRange b0Range = bRange.getDividedLeft();
+        public Solution(byte[] aNumber, byte[] bNumber) {
+            if (aNumber == null || bNumber == null || aNumber.length == 0) {
+                throw new IllegalArgumentException("파라미터가 이상합니다.");
+            }
+            if (aNumber.length != bNumber.length) {
+                throw new IllegalArgumentException("두 수의 길이가 다릅니다.");
+            }
+            this.aNumber = aNumber;
+            this.bNumber = bNumber;
+        }
 
-            int halfN = (aRange.middle - aRange.start);
+        /**
+         * 길이가 같은 두 정수 문자열을 곱한다.<br>
+         * 카라츠바 빠른곱셈 알고리즘으로 O(n^(lg3)) 시간이 걸린다.<br>
+         *
+         * @return 곱셈 결과
+         */
+        public byte[] solve() {
+            return multiplyKaratsuba(0, aNumber.length - 1);
+        }
 
-            // 곱셈1: a1 * b1
-            byte[] a1b1 = solveDivideConquer(a, a1Range, b, b1Range);
-            // 곱셈2: a0 * b0
-            byte[] a0b0 = solveDivideConquer(a, a0Range, b, b0Range);
+        /**
+         * 카라츠바 빠른곱셈을 수행한다.
+         *
+         * @param startIdx  시작인덱스(포함)
+         * @param endIdx    끝인덱스(포함)
+         * @return
+         */
+        private byte[] multiplyKaratsuba(int startIdx, int endIdx) {
+            int middleIdx;
+            try {
+                middleIdx = findMiddleIndex(startIdx, endIdx);
+            } catch (RuntimeException e) {
+                // 자를 수 없을 때
+                return new byte[]{(byte) (aNumber[startIdx] * bNumber[startIdx])};
+            }
 
-            // a1 + a0
-            byte[] aPlus = plusBytes(
-                    a, a1Range.start, a1Range.endExclusive, a, a0Range.start, a0Range.endExclusive);
-            // b1 + b0
-            byte[] bPlus = plusBytes(
-                    b, b1Range.start, b1Range.endExclusive, b, b0Range.start, b0Range.endExclusive);
+            // z0 = a0 * b0
+            byte[] z0 = multiplyKaratsuba(startIdx, middleIdx);
+            // z2 = a1 * b1
+            byte[] z2 = multiplyKaratsuba(middleIdx + 1, endIdx);
+            // z1 = (a0 + a1) * (b0 + b1) - z0 - z2 = a1*b0 + a0*b1
+            byte[] z1 = calculateZ1(startIdx, middleIdx, endIdx, z0, z2);
 
-            int n = Math.max(aPlus.length, bPlus.length);
-            byte[] aPlusArray = upSizing(aPlus, n);
-            byte[] bPlusArray = upSizing(bPlus, n);
+            // result
+            return mergeResult(z0, z1, z2, endIdx - startIdx + 1);
+        }
 
-            // 곱셈3: (a1 + a0)*(b1 + b0) = a1*b1 + a1*b0 + a0*b1 + a0*b0
-            byte[] aPlusBPlus = solveDivideConquer(
-                    aPlusArray, DividableRange.of(0, aPlusArray.length), bPlusArray, DividableRange.of(0, bPlusArray.length)
-            );
+        private int findMiddleIndex(int startIdx, int endIdx) {
+            if (startIdx == endIdx) {
+                throw new RuntimeException("자를 수 없습니다.");
+            }
+            return (startIdx + endIdx) / 2;
+        }
 
-            // a1b1 * 10^n
-            byte[] z1 = multiplyDecimalExp(a1b1, halfN * 2);
-            // a0b0
-            byte[] z3 = a0b0;
-            // ((a1+a0)(b1+b0)-(a1b1+a0b0)) * 10^(n/2)
-            byte[] z2 = plusBytes(a1b1, 0, a1b1.length, a0b0, 0, a0b0.length);
-            z2 = minusBytes(aPlusBPlus, 0, aPlusBPlus.length, z2, 0, z2.length);
-            z2 = multiplyDecimalExp(z2,  halfN);
+        // z1 = (a0 + a1) * (b0 + b1) - z0 - z2
+        //    = a1*b0 + a0*b1
+        private byte[] calculateZ1(int startIdx, int middleIdx, int endIdx, byte[] z0, byte[] z2) {
+            byte[] a1 = copy(aNumber, middleIdx + 1, endIdx);
+            byte[] a0 = copy(aNumber, startIdx, middleIdx);
+            byte[] b1 = copy(bNumber, middleIdx + 1, endIdx);
+            byte[] b0 = copy(bNumber, startIdx, middleIdx);
 
-            byte[] result = plusBytes(z1, 0, z1.length, z2, 0, z2.length);
-            result = plusBytes(result, 0, result.length, z3, 0, z3.length);
+            byte[] a1AddA0 = add(a1, a0);
+            byte[] b1AddB0 = add(b1, b0);
+
+            Solution solution = new Solution(a1AddA0, b1AddB0); // 길이 같게 해줘야함.
+            byte[] z1 = solution.solve();
+
+            byte[] result = sub(z1, z0);
+            return sub(result, z2);
+        }
+
+        private byte[] mergeResult(byte[] z0, byte[] z1, byte[] z2, int n) {
+            byte[] z2Pow = pow10(z2, n);
+            byte[] z1Pow = pow10(z1, n / 2);
+            byte[] result = add(z2Pow, z1Pow);
+            result = add(result, z0);
+
             return result;
         }
-        // 안 쪼개지는 경우. 즉 원소가 1개씩일 때
-        else {
-            int value = a[aRange.start] * b[bRange.start];
-            if (value > 10) {
-                byte[] result = new byte[2];
-                result[0] = (byte)(value % 10);
-                result[1] = (byte)(Math.floorDiv(value, 10));
-                return result;
-            } else {
-                byte[] result = new byte[1];
-                result[0] = (byte) value;
-                return result;
+
+        private byte[] copy(byte[] source, int startIdx, int endIdx) {
+            byte[] result = new byte[endIdx - startIdx + 1];
+            for (int i = startIdx; i <= endIdx; i++) {
+                result[i - startIdx] = source[i];
             }
-        }
-    }
-
-    /**
-     * 배열 사이즈를 늘린다.
-     */
-    private static byte[] upSizing(byte[] a, int n) {
-        if (a.length > n) {
-            throw new IllegalArgumentException("업사이징하려는 사이즈가 더 작음");
+            return result;
         }
 
-        if (a.length == n) {
-            return a;
+        private byte[] pow10(byte[] a, int n) {
+            byte[] result = new byte[a.length + n];
+            // src = 소스
+            // srcPos = 소스의 시작 인덱스
+            // dest = 목적지
+            // destPos = 목적지의 시작 인덱스
+            // length = 복사할 길이
+            System.arraycopy(a, 0, result, n, a.length);
+            return result;
         }
 
-        byte[] upsizingArray = new byte[n];
-        for (int i = 0; i < n; i++) {
-            if (i < a.length) {
-                upsizingArray[i] = a[i];
-            } else {
-                upsizingArray[i] = 0;
+        private byte[] add(byte[] a, byte[] b) {
+            int n = Math.max(a.length, b.length);
+            byte[] result = new byte[n + 1];
+            int carry = 0;
+            for (int i = 0; i < n; i++) {
+                byte aVal = i < a.length ? a[i] : 0;
+                byte bVal = i < b.length ? b[i] : 0;
+                int sum = aVal + bVal + carry;
+                result[i] = (byte) (sum % 10);
+                carry = sum / 10;
             }
-        }
-        return upsizingArray;
-    }
-
-    /**
-     * a + b 연산을 한다.
-     */
-    private static byte[] plusBytes(
-            byte[] a, int aStart, int aEndExclusive,
-            byte[] b, int bStart, int bEndExclusive
-    ) {
-        int aLength = aEndExclusive - aStart;
-        int bLength = bEndExclusive - bStart;
-
-        byte[] resultArray = new byte[Math.max(aLength, bLength) + 1];
-
-        // 각 자릿수에 맞춰 덧셈 연산을 한다.
-        for (int i = 0; i < resultArray.length; ++i) {
-            byte aValue = i < aLength ? a[aStart + i] : 0;
-            byte bValue = i < bLength ? b[bStart + i] : 0;
-
-            resultArray[i] = (byte) (aValue + bValue);
-        }
-
-        // 10진법에 맞게 각 자릿수를 조정한다.
-        resultArray = normalize(resultArray);
-
-        return trimBytes(resultArray);
-    }
-
-    /**
-     * a >= b 인 수에 대해 a - b 연산을 한다.<br>
-     * 만약 b 가 더 큰 경우는 고려하지 않는다. 따라서 b 가 더 큰 경우는 자릿수에 음수가 포함되게 된다.<br>
-     */
-    private static byte[] minusBytes(
-            byte[] a, int aStart, int aEndExclusive,
-            byte[] b, int bStart, int bEndExclusive
-    ) {
-        int aLength = aEndExclusive - aStart;
-        int bLength = bEndExclusive - bStart;
-
-        byte[] resultArray = new byte[Math.max(aLength, bLength) + 1];
-
-        // 각 자릿수에 맞춰 뺄셈 연산을 한다.
-        for (int i = 0; i < resultArray.length; ++i) {
-            byte aValue = i < aLength ? a[aStart + i] : 0;
-            byte bValue = i < bLength ? b[bStart + i] : 0;
-
-            resultArray[i] = (byte) (aValue - bValue);
-        }
-
-        // 각 자릿수의 값이 음수이면 윗 자릿수에서 빌려와서 양수로 만들어준다.
-        for (int i = 0; i < resultArray.length; ++i) {
-            if (resultArray[i] < 0) {
-                resultArray[i+1] -= 1;
-                resultArray[i] += 10;
+            result[n] = (byte) carry;
+            if (result[n] == 0) {
+                byte[] newResult = new byte[n];
+                System.arraycopy(result, 0, newResult, 0, n);
+                return newResult;
             }
+            return result;
         }
 
-        // 10진법에 맞게 각 자릿수를 조정한다.
-        resultArray = normalize(resultArray);
-
-        return trimBytes(resultArray);
-    }
-
-    /**
-     * 10진법에 맞게 자릿수들에서 올림을 통해 값을 조정한다.
-     */
-    private static byte[] normalize(byte[] a) {
-        byte curPos, nextPos;
-        for (int i = 0; i < a.length; ++i) {
-            curPos = (byte) (a[i] % 10);
-            nextPos = (byte) Math.floorDiv(a[i], 10);
-
-            a[i] = curPos;
-            if (i+1 < a.length) {
-                a[i + 1] += nextPos;
-            } else if (nextPos > 0) {
-                throw new IllegalStateException("배열 길이가 필요한 것보다 짧습니다! 확인이 필요해요.");
+        private byte[] sub(byte[] a, byte[] b) {
+            int n = Math.max(a.length, b.length);
+            byte[] result = new byte[n];
+            int borrow = 0;
+            for (int i = 0; i < n; i++) {
+                byte aVal = i < a.length ? a[i] : 0;
+                byte bVal = i < b.length ? b[i] : 0;
+                int diff = aVal - bVal - borrow;
+                if (diff < 0) {
+                    diff += 10;
+                    borrow = 1;
+                } else {
+                    borrow = 0;
+                }
+                result[i] = (byte) diff;
             }
-        }
-        return trimBytes(a);
-    }
-
-    /**
-     * a * 10^(decimalExp)
-     */
-    private static byte[] multiplyDecimalExp(byte[] a, int decimalExp) {
-        byte[] result = new byte[a.length + decimalExp];
-        for (int i = 0; i < decimalExp; i++) {
-            result[i] = 0;
-        }
-        System.arraycopy(a, 0, result, decimalExp + 0, a.length);
-
-        return trimBytes(result);
-    }
-
-    private static byte[] trimBytes(byte[] a) {
-        // 가장 큰 자릿수의 인덱스를 구한다.
-        int lastIndex = a.length - 1;
-        for (int i = a.length - 1; i >= 0; i--) {
-            if (a[i] != 0) {
-                lastIndex = i;
-                break;
+            for (int i = n - 1; i >= 0; i--) {
+                if (result[i] != 0) {
+                    if (i == n - 1) {
+                        return result;
+                    } else {
+                        byte[] newResult = new byte[i + 1];
+                        System.arraycopy(result, 0, newResult, 0, i + 1);
+                        return newResult;
+                    }
+                }
             }
-            if (i == 0 && a[i] == 0) {
-                lastIndex = 0;
-            }
-        }
-
-        // 큰 자릿수들이 0으로 채워져있으면 배열을 조정한다.
-        if (lastIndex == a.length - 1) {
-            return a;
-        } else {
-            byte[] subarray = new byte[lastIndex + 1];
-            System.arraycopy(a, 0, subarray, 0, lastIndex + 1);
-            return subarray;
+            return result;
         }
     }
 }
