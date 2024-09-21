@@ -30,8 +30,12 @@ public class KaratsubaMultiplyTest {
             "123456789, 1, 123456789",
             "1, 987654321, 987654321"
     })
-    public void 카라츠바_알고리즘_테스트(String aNumber, String bNumber, String expected) {
-        String result = KaratsubaMultiply.multiply(aNumber, bNumber);
-        assertEquals(expected, result);
+    public void 카라츠바_알고리즘_테스트(String aNumberString, String bNumberString, String expected) {
+        int maxLength = Math.max(aNumberString.length(), bNumberString.length());
+        byte[] aNumber = KaratsubaMultiply.DecimalByteArrayUtils.numberStringToByteArrayWithZeroPadding(aNumberString, maxLength);
+        byte[] bNumber = KaratsubaMultiply.DecimalByteArrayUtils.numberStringToByteArrayWithZeroPadding(bNumberString, maxLength);
+
+        KaratsubaMultiply.Solution solution = new KaratsubaMultiply.Solution(aNumber, bNumber, 1, 0);
+        assertEquals(expected, KaratsubaMultiply.DecimalByteArrayUtils.toNumberString(solution.solve()));
     }
 }

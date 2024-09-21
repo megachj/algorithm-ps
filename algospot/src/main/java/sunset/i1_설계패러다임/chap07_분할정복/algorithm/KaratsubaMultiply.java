@@ -23,89 +23,52 @@ public class KaratsubaMultiply {
         String bNumberString = input[1];
         int maxLength = Math.max(aNumberString.length(), bNumberString.length());
 
-        byte[] aNumber = numberStringToByteArrayWithZeroPadding(aNumberString, maxLength);
-        byte[] bNumber = numberStringToByteArrayWithZeroPadding(bNumberString, maxLength);
+        byte[] aNumber = DecimalByteArrayUtils.numberStringToByteArrayWithZeroPadding(aNumberString, maxLength);
+        byte[] bNumber = DecimalByteArrayUtils.numberStringToByteArrayWithZeroPadding(bNumberString, maxLength);
 
-        Solution solution = new Solution(aNumber, bNumber);
-        printByteArray(solution.solve());
+        Solution solution = new Solution(aNumber, bNumber, 1, 0);
+        System.out.println(DecimalByteArrayUtils.toNumberString(solution.solve()));
     }
 
-    /**
-     * 숫자 문자열을 n 사이즈인 byte 배열로 변환한다. 사이즈가 부족할 경우 0으로 채운다.
-     *
-     * @param numberString  변환할 숫자 문자열
-     * @param n             byte 배열의 사이즈
-     * @return 변환된 byte 배열
-     */
-    private static byte[] numberStringToByteArrayWithZeroPadding(String numberString, int n) {
-        // 문자열의 길이만큼의 byte 배열 생성
-        byte[] byteArray = new byte[n];
-
-        // 각 문자를 byte로 변환하여 배열에 저장
-        int numberLength = numberString.length();
-        for (int i = 0; i < numberLength; i++) {
-            byteArray[i] = (byte) (numberString.charAt(numberLength - i - 1) - '0');
-        }
-        // 나머지는 0으로 채운다.
-        for (int i = numberLength; i < n; i++) {
-            byteArray[i] = 0;
-        }
-
-        return byteArray;
-    }
-
-    /**
-     * byte 배열을 출력한다.
-     *
-     * @param byteArray
-     */
-    private static void printByteArray(byte[] byteArray) {
-        for (int i = byteArray.length - 1; i >= 0; i--) {
-            System.out.print(byteArray[i]);
-        }
-        System.out.println();
-    }
-
-    static class Solution {
+    public static class Solution {
 
         private final byte[] aNumber;
         private final byte[] bNumber;
 
-        private String toString(byte[] byteArray) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[");
-            for (int i = 0; i < byteArray.length; i++) {
-                sb.append(byteArray[i]);
-                if (i != byteArray.length - 1) {
-                    sb.append(", ");
-                }
-            }
-            sb.append("]");
-            return sb.toString();
-        }
+        private final int threshold; // 재귀호출을 멈출 임계값
 
-        private String toString(byte[] byteArray, int startIdx, int endIdx) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[");
-            for (int i = startIdx; i <= endIdx; i++) {
-                sb.append(byteArray[i]);
-                if (i != endIdx) {
-                    sb.append(", ");
-                }
-            }
-            sb.append("]");
-            return sb.toString();
-        }
+        private int recursiveDepth; // 재귀호출 깊이
 
-        public Solution(byte[] aNumber, byte[] bNumber) {
+        public Solution(byte[] aNumber, byte[] bNumber, int threshold, int recursiveDepth) {
             if (aNumber == null || bNumber == null || aNumber.length == 0) {
                 throw new IllegalArgumentException("파라미터가 이상합니다.");
             }
-            if (aNumber.length != bNumber.length) {
-                throw new IllegalArgumentException("두 수의 길이가 다릅니다.");
+            if (threshold < 1) {
+                throw new IllegalArgumentException("thredhold는 1 이상이어야 합니다.");
             }
-            this.aNumber = aNumber;
-            this.bNumber = bNumber;
+
+            if (aNumber.length == bNumber.length) {
+                this.aNumber = aNumber;
+                this.bNumber = bNumber;
+            } else if (aNumber.length < bNumber.length) {
+                this.aNumber = new byte[bNumber.length];
+                System.arraycopy(aNumber, 0, this.aNumber, 0, aNumber.length);
+                // 나머지는 0으로 채운다.
+                for (int i = aNumber.length; i < bNumber.length; i++) {
+                    this.aNumber[i] = 0;
+                }
+                this.bNumber = bNumber;
+            } else {
+                this.bNumber = new byte[aNumber.length];
+                System.arraycopy(bNumber, 0, this.bNumber, 0, bNumber.length);
+                // 나머지는 0으로 채운다.
+                for (int i = bNumber.length; i < aNumber.length; i++) {
+                    this.bNumber[i] = 0;
+                }
+                this.aNumber = aNumber;
+            }
+            this.threshold = threshold;
+            this.recursiveDepth = recursiveDepth;
         }
 
         /**
@@ -126,95 +89,134 @@ public class KaratsubaMultiply {
          * @return
          */
         private byte[] multiplyKaratsuba(int startIdx, int endIdx) {
-            System.out.printf("카라츠바 시작: a%s * b%s\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx));
-            int middleIdx;
-            try {
-                middleIdx = findMiddleIndex(startIdx, endIdx);
-            } catch (RuntimeException e) {
-                // 자를 수 없을 때
-                byte[] result = new byte[]{(byte) (aNumber[startIdx] * bNumber[startIdx])};
-                System.out.printf("카라츠바 끝: a%s * b%s = %s\n\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx), toString(result));
+            logForDebug(String.format("\n---------------------- Step %d 시작 ----------------------", ++recursiveDepth));
+            logForDebug(
+                    String.format("Step %d: a%s * b%s",
+                            recursiveDepth,
+                            DecimalByteArrayUtils.toString(aNumber, startIdx, endIdx),
+                            DecimalByteArrayUtils.toString(bNumber, startIdx, endIdx))
+            );
+
+            if (endIdx - startIdx + 1 <= threshold) {
+                byte[] result = DecimalByteArrayCalculator.multiply(aNumber, bNumber);
+                logForDebug(
+                        String.format("Step %d 결과(thredhold 이하라 그냥 곱셈을 합니다): a%s * b%s = %s",
+                                recursiveDepth,
+                                DecimalByteArrayUtils.toString(aNumber),
+                                DecimalByteArrayUtils.toString(bNumber),
+                                DecimalByteArrayUtils.toString(result))
+                );
+                logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth--));
                 return result;
             }
 
+            int middleIdx = (startIdx + endIdx) / 2;
+
             // z0 = a0 * b0
             byte[] z0 = multiplyKaratsuba(startIdx, middleIdx);
-            System.out.printf("z0 = a0%s * b0%s = %s\n", toString(aNumber, startIdx, middleIdx), toString(bNumber, startIdx, middleIdx), toString(z0));
+            logForDebug(
+                    String.format("Step %d: z0 = a0%s * b0%s = %s",
+                            recursiveDepth,
+                            DecimalByteArrayUtils.toString(aNumber, startIdx, middleIdx),
+                            DecimalByteArrayUtils.toString(bNumber, startIdx, middleIdx),
+                            DecimalByteArrayUtils.toString(z0))
+            );
+
             // z2 = a1 * b1
             byte[] z2 = multiplyKaratsuba(middleIdx + 1, endIdx);
-            System.out.printf("z2 = a1%s * b1%s = %s\n", toString(aNumber, middleIdx + 1, endIdx), toString(bNumber, middleIdx + 1, endIdx), toString(z2));
+            logForDebug(
+                    String.format("Step %d: z2 = a1%s * b1%s = %s",
+                            recursiveDepth,
+                            DecimalByteArrayUtils.toString(aNumber, middleIdx + 1, endIdx),
+                            DecimalByteArrayUtils.toString(bNumber, middleIdx + 1, endIdx),
+                            DecimalByteArrayUtils.toString(z2))
+            );
+
             // z1 = (a0 + a1) * (b0 + b1) - z0 - z2 = a1*b0 + a0*b1
             byte[] z1 = calculateZ1(startIdx, middleIdx, endIdx, z0, z2);
-            System.out.printf("z1 = (a0%s + a1%s) * (b0%s + b1%s) - z0 - z2 = %s\n", toString(aNumber, startIdx, middleIdx), toString(aNumber, middleIdx + 1, endIdx), toString(bNumber, startIdx, middleIdx), toString(bNumber, middleIdx + 1, endIdx), toString(z1));
+            logForDebug(String.format("Step %d: z1 = (a0%s + a1%s) * (b0%s + b1%s) - z0 - z2 = %s",
+                    recursiveDepth,
+                    DecimalByteArrayUtils.toString(aNumber, startIdx, middleIdx),
+                    DecimalByteArrayUtils.toString(aNumber, middleIdx + 1, endIdx),
+                    DecimalByteArrayUtils.toString(bNumber, startIdx, middleIdx),
+                    DecimalByteArrayUtils.toString(bNumber, middleIdx + 1, endIdx),
+                    DecimalByteArrayUtils.toString(z1))
+            );
 
             // result
             return mergeResult(z0, z1, z2, startIdx, endIdx);
         }
 
-        private int findMiddleIndex(int startIdx, int endIdx) {
-            if (startIdx == endIdx) {
-                throw new RuntimeException("자를 수 없습니다.");
-            }
-            return (startIdx + endIdx) / 2;
-        }
-
         // z1 = (a0 + a1) * (b0 + b1) - z0 - z2
         //    = a1*b0 + a0*b1
         private byte[] calculateZ1(int startIdx, int middleIdx, int endIdx, byte[] z0, byte[] z2) {
-            byte[] a1 = copy(aNumber, middleIdx + 1, endIdx);
-            byte[] a0 = copy(aNumber, startIdx, middleIdx);
-            byte[] b1 = copy(bNumber, middleIdx + 1, endIdx);
-            byte[] b0 = copy(bNumber, startIdx, middleIdx);
-            System.out.printf("a1 = %s, a0 = %s, b1 = %s, b0 = %s\n", toString(a1), toString(a0), toString(b1), toString(b0));
+            byte[] a1 = DecimalByteArrayUtils.copy(aNumber, middleIdx + 1, endIdx);
+            byte[] a0 = DecimalByteArrayUtils.copy(aNumber, startIdx, middleIdx);
+            byte[] b1 = DecimalByteArrayUtils.copy(bNumber, middleIdx + 1, endIdx);
+            byte[] b0 = DecimalByteArrayUtils.copy(bNumber, startIdx, middleIdx);
+            //logForDebug(String.format("Step %d: a1 = %s, a0 = %s, b1 = %s, b0 = %s", recursiveDepth, toString(a1), toString(a0), toString(b1), toString(b0)));
 
-            byte[] a1AddA0 = add(a1, a0);
-            System.out.printf("a1 + a0 = %s\n", toString(a1AddA0));
-            byte[] b1AddB0 = add(b1, b0);
-            System.out.printf("b1 + b0 = %s\n", toString(b1AddB0));
+            byte[] a1AddA0 = DecimalByteArrayCalculator.add(a1, a0);
+            //logForDebug(String.format("Step %d: a1 + a0 = %s", recursiveDepth, toString(a1AddA0)));
+            byte[] b1AddB0 = DecimalByteArrayCalculator.add(b1, b0);
+            //logForDebug(String.format("Step %d: b1 + b0 = %s", recursiveDepth, toString(b1AddB0)));
 
-            Solution solution = new Solution(a1AddA0, b1AddB0); // 길이 같게 해줘야함.
+            Solution solution = new Solution(a1AddA0, b1AddB0, this.threshold, this.recursiveDepth);
             byte[] a1a0b1b0 = solution.solve();
-            byte[] midResult = sub(a1a0b1b0, z0);
-            byte[] z1 = sub(midResult, z2);
-            System.out.printf("z1 = %s\n", toString(z1));
-
-            return z1;
+            byte[] midResult = DecimalByteArrayCalculator.sub(a1a0b1b0, z0);
+            return DecimalByteArrayCalculator.sub(midResult, z2);
         }
 
         private byte[] mergeResult(byte[] z0, byte[] z1, byte[] z2, int startIdx, int endIdx) {
             int n = endIdx - startIdx + 1;
+            int powerOfTwo = nextPowerOfTwo(n);
+            logForDebug(String.format("Step %d: n = %d, powerOfTwo = %d", recursiveDepth, n, powerOfTwo));
 
-            byte[] z2Pow = pow10(z2, n);
-            System.out.printf("z2(10^%d) = %s\n", n, toString(z2Pow));
-            byte[] z1Pow = pow10(z1, n / 2);
-            System.out.printf("z1(10^%d) = %s\n", n/2, toString(z1Pow));
-            byte[] result = add(z2Pow, z1Pow);
-            result = add(result, z0);
-            System.out.printf("카라츠바 끝: a%s * b%s = z2Pow%s + z1Pow%s + z0%s = %s\n\n", toString(aNumber, startIdx, endIdx), toString(bNumber, startIdx, endIdx), toString(z2Pow), toString(z1Pow), toString(z0), toString(result));
+            byte[] z2Pow = DecimalByteArrayCalculator.pow10(z2, powerOfTwo);
+            logForDebug(String.format("Step %d: z2(10^%d) = %s", recursiveDepth, powerOfTwo, DecimalByteArrayUtils.toString(z2Pow)));
+
+            byte[] z1Pow = DecimalByteArrayCalculator.pow10(z1, powerOfTwo / 2);
+            logForDebug(String.format("Step %d: z1(10^%d) = %s", recursiveDepth, powerOfTwo/2, DecimalByteArrayUtils.toString(z1Pow)));
+            byte[] result = DecimalByteArrayCalculator.add(z2Pow, z1Pow);
+            result = DecimalByteArrayCalculator.add(result, z0);
+
+            logForDebug(
+                    String.format("Step %d 결과: a%s * b%s = z2Pow%s + z1Pow%s + z0%s = %s",
+                            recursiveDepth,
+                            DecimalByteArrayUtils.toString(aNumber, startIdx, endIdx),
+                            DecimalByteArrayUtils.toString(bNumber, startIdx, endIdx),
+                            DecimalByteArrayUtils.toString(z2Pow),
+                            DecimalByteArrayUtils.toString(z1Pow),
+                            DecimalByteArrayUtils.toString(z0),
+                            DecimalByteArrayUtils.toString(result))
+            );
+            logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth--));
 
             return result;
         }
 
-        private byte[] copy(byte[] source, int startIdx, int endIdx) {
-            byte[] result = new byte[endIdx - startIdx + 1];
-            for (int i = startIdx; i <= endIdx; i++) {
-                result[i - startIdx] = source[i];
-            }
-            return result;
+        private int nextPowerOfTwo(int n) {
+            return (int) Math.pow(2, Math.ceil(Math.log(n) / Math.log(2)));
         }
 
-        private byte[] pow10(byte[] a, int n) {
-            byte[] result = new byte[a.length + n];
-            // src = 소스
-            // srcPos = 소스의 시작 인덱스
-            // dest = 목적지
-            // destPos = 목적지의 시작 인덱스
-            // length = 복사할 길이
-            System.arraycopy(a, 0, result, n, a.length);
-            return result;
+        public static void logForDebug(String message) {
+            System.out.println(message);
         }
+    }
 
-        private byte[] add(byte[] a, byte[] b) {
+    public static class DecimalByteArrayCalculator {
+
+        /**
+         * 두 양수인 a, b를 더한다.
+         *
+         * @param a
+         * @param b
+         * @return a + b
+         * @throws IllegalArgumentException a 또는 b가 음수일 때 발생한다.
+         */
+        public static byte[] add(byte[] a, byte[] b) {
+            checkPositive(a, b);
+
             int n = Math.max(a.length, b.length);
             byte[] result = new byte[n + 1];
             int carry = 0;
@@ -227,21 +229,20 @@ public class KaratsubaMultiply {
             }
             result[n] = (byte) carry;
 
-            for (int i = n; i >= 0; i--) {
-                if (result[i] != 0) {
-                    if (i == n) {
-                        return result;
-                    } else {
-                        byte[] newResult = new byte[i + 1];
-                        System.arraycopy(result, 0, newResult, 0, i + 1);
-                        return newResult;
-                    }
-                }
-            }
-            return result;
+            return adjustArrayLength(result);
         }
 
-        private byte[] sub(byte[] a, byte[] b) {
+        /**
+         * 두 양수인 a, b를 뺀다. 이때 a >= b 이어야 한다.
+         *
+         * @param a
+         * @param b
+         * @return a - b (>= 0)
+         * @throws IllegalArgumentException a < b 일 때 발생한다.
+         */
+        public static byte[] sub(byte[] a, byte[] b) {
+            checkPositive(a, b);
+
             int n = Math.max(a.length, b.length);
             byte[] result = new byte[n];
             int borrow = 0;
@@ -257,9 +258,62 @@ public class KaratsubaMultiply {
                 }
                 result[i] = (byte) diff;
             }
-            for (int i = n - 1; i >= 0; i--) {
+
+            return adjustArrayLength(result);
+        }
+
+        /**
+         * 두 양수인 a, b를 곱한다.
+         *
+         * @param a
+         * @param b
+         * @return a * b
+         */
+        public static byte[] multiply(byte[] a, byte[] b) {
+            checkPositive(a, b);
+
+            int maxLength = a.length + b.length + 1;
+            byte[] result = new byte[maxLength];
+
+            for (int i = 0; i < a.length; i++) {
+                for (int j = 0; j < b.length; j++) {
+                    int mul = a[i] * b[j];
+                    int sum = result[i + j] + mul;
+                    result[i + j] = (byte) (sum % 10);
+                    result[i + j + 1] += sum / 10;
+                }
+            }
+
+            return adjustArrayLength(result);
+        }
+
+        /**
+         * 양수인 a * 10^n을 계산한다.
+         *
+         * @param a
+         * @param n
+         * @return a * 10^n
+         */
+        public static byte[] pow10(byte[] a, int n) {
+            checkPositive(a);
+
+            byte[] result = new byte[a.length + n];
+            // src = 소스
+            // srcPos = 소스의 시작 인덱스
+            // dest = 목적지
+            // destPos = 목적지의 시작 인덱스
+            // length = 복사할 길이
+            System.arraycopy(a, 0, result, n, a.length);
+
+            return adjustArrayLength(result);
+        }
+
+        public static byte[] adjustArrayLength(byte[] result) {
+            checkPositive(result);
+
+            for (int i = result.length - 1; i >= 0; i--) {
                 if (result[i] != 0) {
-                    if (i == n - 1) {
+                    if (i == result.length - 1) {
                         return result;
                     } else {
                         byte[] newResult = new byte[i + 1];
@@ -268,9 +322,117 @@ public class KaratsubaMultiply {
                     }
                 }
             }
-            return result;
+            // 모든 자리가 0인 경우
+            return new byte[]{0};
+        }
+
+        public static void checkPositive(byte[]... arrays) {
+            for (byte[] array : arrays) {
+                if (isNegative(array)) {
+                    throw new IllegalArgumentException("음수는 지원하지 않습니다.");
+                }
+            }
+        }
+
+        public static boolean isNegative(byte[] a) {
+            return a[a.length - 1] < 0;
         }
     }
 
+    public static class DecimalByteArrayUtils {
 
+        /**
+         * 숫자 문자열을 n 사이즈인 byte 배열로 변환한다. 사이즈가 부족할 경우 0으로 채운다.
+         *
+         * @param numberString  변환할 숫자 문자열
+         * @param n             byte 배열의 사이즈
+         * @return 변환된 byte 배열
+         */
+        public static byte[] numberStringToByteArrayWithZeroPadding(String numberString, int n) {
+            // 문자열의 길이만큼의 byte 배열 생성
+            byte[] byteArray = new byte[n];
+
+            // 각 문자를 byte로 변환하여 배열에 저장
+            int numberLength = numberString.length();
+            for (int i = 0; i < numberLength; i++) {
+                byteArray[i] = (byte) (numberString.charAt(numberLength - i - 1) - '0');
+            }
+            // 나머지는 0으로 채운다.
+            for (int i = numberLength; i < n; i++) {
+                byteArray[i] = 0;
+            }
+
+            return byteArray;
+        }
+
+        /**
+         * byte 배열을 숫자 문자열로 변환한다.
+         *
+         * @param byteArray 10 진수 양수
+         * @return 변환된 숫자 문자열
+         */
+        public static String toNumberString(byte[] byteArray) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = byteArray.length - 1; i >= 0; i--) {
+                sb.append(byteArray[i]);
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Byte 배열을 복사한다.
+         *
+         * @param source    복사할 배열
+         * @param startIdx  시작 인덱스(포함)
+         * @param endIdx    끝 인덱스(포함)
+         * @return 복사된 배열
+         */
+        public static byte[] copy(byte[] source, int startIdx, int endIdx) {
+            int length = endIdx - startIdx + 1;
+
+            byte[] result = new byte[length];
+            System.arraycopy(source, startIdx, result, 0, length);
+            return result;
+        }
+
+        /**
+         * 배열을 문자열로 변환한다.
+         *
+         * @param byteArray
+         * @return
+         */
+        public static String toString(byte[] byteArray) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < byteArray.length; i++) {
+                sb.append(byteArray[i]);
+                if (i != byteArray.length - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
+        /**
+         * 배열을 문자열로 변환한다.
+         *
+         * @param byteArray
+         * @param startIdx
+         * @param endIdx
+         * @return
+         */
+        public static String toString(byte[] byteArray, int startIdx, int endIdx) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = startIdx; i <= endIdx; i++) {
+                sb.append(byteArray[i]);
+                if (i != endIdx) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+    }
 }
