@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
- * @see <a href="https://www.acmicpc.net/problem/13277">문제</a>
+ * @see <a href="https://www.acmicpc.net/problem/13277">참고) baekjoon</a> 해당 문제를 카라츠바 알고리즘으로 풀면 시간 초과가 발생한다. FFT 알고리즘을 이용해 nlogn 시간으로 해결해야 한다.
  */
 public class KaratsubaMultiply {
 
+    // 디버그 로그 활성화 플래그
     private static final boolean ENABLED_DEBUG = false;
 
     public static void main(String[] args) throws Exception {
