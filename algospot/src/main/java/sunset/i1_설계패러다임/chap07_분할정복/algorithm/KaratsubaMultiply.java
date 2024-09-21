@@ -36,8 +36,8 @@ public class KaratsubaMultiply {
         private final byte[] bNumber;
 
         private final int threshold; // 재귀호출을 멈출 임계값
-
         private int recursiveDepth; // 재귀호출 깊이
+        private final boolean isOriginalObject;
 
         public Solution(byte[] aNumber, byte[] bNumber, int threshold, int recursiveDepth) {
             if (aNumber == null || bNumber == null || aNumber.length == 0) {
@@ -69,6 +69,8 @@ public class KaratsubaMultiply {
             }
             this.threshold = threshold;
             this.recursiveDepth = recursiveDepth;
+
+            this.isOriginalObject = recursiveDepth == 0;
         }
 
         /**
@@ -89,13 +91,7 @@ public class KaratsubaMultiply {
          * @return
          */
         private byte[] multiplyKaratsuba(int startIdx, int endIdx) {
-            logForDebug(String.format("\n---------------------- Step %d 시작 ----------------------", ++recursiveDepth));
-            logForDebug(
-                    String.format("Step %d: a%s * b%s",
-                            recursiveDepth,
-                            DecimalByteArrayUtils.toString(aNumber, startIdx, endIdx),
-                            DecimalByteArrayUtils.toString(bNumber, startIdx, endIdx))
-            );
+            ++recursiveDepth;
 
             if (endIdx - startIdx + 1 <= threshold) {
                 byte[] targetA = DecimalByteArrayUtils.copy(aNumber, startIdx, endIdx);
@@ -108,45 +104,28 @@ public class KaratsubaMultiply {
                                 DecimalByteArrayUtils.toString(targetB),
                                 DecimalByteArrayUtils.toString(result))
                 );
-                logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth--));
+                logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth));
+                --recursiveDepth;
                 return result;
             }
 
-            int middleIdx = (startIdx + endIdx) / 2;
+            int middleIdx = calculateMiddleIdx(startIdx, endIdx);
 
             // z0 = a0 * b0
             byte[] z0 = multiplyKaratsuba(startIdx, middleIdx);
-            logForDebug(
-                    String.format("Step %d: z0 = a0%s * b0%s = %s",
-                            recursiveDepth,
-                            DecimalByteArrayUtils.toString(aNumber, startIdx, middleIdx),
-                            DecimalByteArrayUtils.toString(bNumber, startIdx, middleIdx),
-                            DecimalByteArrayUtils.toString(z0))
-            );
 
             // z2 = a1 * b1
             byte[] z2 = multiplyKaratsuba(middleIdx + 1, endIdx);
-            logForDebug(
-                    String.format("Step %d: z2 = a1%s * b1%s = %s",
-                            recursiveDepth,
-                            DecimalByteArrayUtils.toString(aNumber, middleIdx + 1, endIdx),
-                            DecimalByteArrayUtils.toString(bNumber, middleIdx + 1, endIdx),
-                            DecimalByteArrayUtils.toString(z2))
-            );
 
             // z1 = (a0 + a1) * (b0 + b1) - z0 - z2 = a1*b0 + a0*b1
             byte[] z1 = calculateZ1(startIdx, middleIdx, endIdx, z0, z2);
-            logForDebug(String.format("Step %d: z1 = (a0%s + a1%s) * (b0%s + b1%s) - z0 - z2 = %s",
-                    recursiveDepth,
-                    DecimalByteArrayUtils.toString(aNumber, startIdx, middleIdx),
-                    DecimalByteArrayUtils.toString(aNumber, middleIdx + 1, endIdx),
-                    DecimalByteArrayUtils.toString(bNumber, startIdx, middleIdx),
-                    DecimalByteArrayUtils.toString(bNumber, middleIdx + 1, endIdx),
-                    DecimalByteArrayUtils.toString(z1))
-            );
 
             // result
             return mergeResult(z0, z1, z2, startIdx, endIdx);
+        }
+
+        private int calculateMiddleIdx(int startIdx, int endIdx) {
+            return (startIdx + endIdx) / 2;
         }
 
         // z1 = (a0 + a1) * (b0 + b1) - z0 - z2
@@ -156,31 +135,37 @@ public class KaratsubaMultiply {
             byte[] a0 = DecimalByteArrayUtils.copy(aNumber, startIdx, middleIdx);
             byte[] b1 = DecimalByteArrayUtils.copy(bNumber, middleIdx + 1, endIdx);
             byte[] b0 = DecimalByteArrayUtils.copy(bNumber, startIdx, middleIdx);
-            //logForDebug(String.format("Step %d: a1 = %s, a0 = %s, b1 = %s, b0 = %s", recursiveDepth, toString(a1), toString(a0), toString(b1), toString(b0)));
 
             byte[] a1AddA0 = DecimalByteArrayCalculator.add(a1, a0);
-            //logForDebug(String.format("Step %d: a1 + a0 = %s", recursiveDepth, toString(a1AddA0)));
             byte[] b1AddB0 = DecimalByteArrayCalculator.add(b1, b0);
-            //logForDebug(String.format("Step %d: b1 + b0 = %s", recursiveDepth, toString(b1AddB0)));
 
             Solution solution = new Solution(a1AddA0, b1AddB0, this.threshold, this.recursiveDepth);
             byte[] a1a0b1b0 = solution.solve();
             byte[] midResult = DecimalByteArrayCalculator.sub(a1a0b1b0, z0);
+
             return DecimalByteArrayCalculator.sub(midResult, z2);
         }
 
         private byte[] mergeResult(byte[] z0, byte[] z1, byte[] z2, int startIdx, int endIdx) {
-            int n = endIdx - startIdx + 1;
-            int powerOfTwo = nextPowerOfTwo(n);
-            logForDebug(String.format("Step %d: n = %d, powerOfTwo = %d", recursiveDepth, n, powerOfTwo));
+            int middleIdx = calculateMiddleIdx(startIdx, endIdx);
+            int halfN = middleIdx - startIdx + 1;
+            int fullN = halfN * 2;
 
-            byte[] z2Pow = DecimalByteArrayCalculator.pow10(z2, powerOfTwo);
-            logForDebug(String.format("Step %d: z2(10^%d) = %s", recursiveDepth, powerOfTwo, DecimalByteArrayUtils.toString(z2Pow)));
+            byte[] z2Pow = DecimalByteArrayCalculator.pow10(z2, fullN);
+            byte[] z1Pow = DecimalByteArrayCalculator.pow10(z1, halfN);
 
-            byte[] z1Pow = DecimalByteArrayCalculator.pow10(z1, powerOfTwo / 2);
-            logForDebug(String.format("Step %d: z1(10^%d) = %s", recursiveDepth, powerOfTwo/2, DecimalByteArrayUtils.toString(z1Pow)));
             byte[] result = DecimalByteArrayCalculator.add(z2Pow, z1Pow);
             result = DecimalByteArrayCalculator.add(result, z0);
+
+            logForDebug(String.format("Step %d: halfN(n/2) = %d, fullN(n) = %d", recursiveDepth, halfN, fullN));
+            logForDebug(String.format("Step %d: a%s", recursiveDepth, DecimalByteArrayUtils.toString(aNumber, startIdx, endIdx)));
+            logForDebug(String.format("Step %d: b%s", recursiveDepth, DecimalByteArrayUtils.toString(bNumber, startIdx, endIdx)));
+            logForDebug(String.format("Step %d: z2 = a1 * b1 = %s", recursiveDepth, DecimalByteArrayUtils.toString(z2)));
+            logForDebug(String.format("Step %d: z1 = (a1 + a0) * (b1 + b0) = %s", recursiveDepth, DecimalByteArrayUtils.toString(z1)));
+            logForDebug(String.format("Step %d: z0 = a0 * b0 = %s", recursiveDepth, DecimalByteArrayUtils.toString(z0)));
+
+            logForDebug(String.format("Step %d: z2Pow = z2 * (10^%d) = %s", recursiveDepth, fullN, DecimalByteArrayUtils.toString(z2Pow)));
+            logForDebug(String.format("Step %d: z1Pow = z1 * (10^%d) = %s", recursiveDepth, halfN, DecimalByteArrayUtils.toString(z1Pow)));
 
             logForDebug(
                     String.format("Step %d 결과: a%s * b%s = z2Pow%s + z1Pow%s + z0%s = %s",
@@ -192,17 +177,15 @@ public class KaratsubaMultiply {
                             DecimalByteArrayUtils.toString(z0),
                             DecimalByteArrayUtils.toString(result))
             );
-            logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth--));
-
+            logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth));
+            --recursiveDepth;
             return result;
         }
 
-        private int nextPowerOfTwo(int n) {
-            return (int) Math.pow(2, Math.ceil(Math.log(n) / Math.log(2)));
-        }
-
-        public static void logForDebug(String message) {
-            System.out.println(message);
+        private void logForDebug(String message) {
+            if (this.isOriginalObject) {
+                System.out.println(message);
+            }
         }
     }
 
