@@ -8,13 +8,7 @@ import java.io.InputStreamReader;
  */
 public class KaratsubaMultiply {
 
-    // 테스트 케이스
-    // 1 1 = 1
-    // 11 11 = 121
-    // 123 1 = 123
-    // 1 123 = 123
-    // 123 12 = 1476
-    // 12 123 = 1476
+    private static final boolean ENABLED_DEBUG = false;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -183,7 +177,7 @@ public class KaratsubaMultiply {
         }
 
         private void logForDebug(String message) {
-            if (this.isOriginalObject) {
+            if (ENABLED_DEBUG && this.isOriginalObject) {
                 System.out.println(message);
             }
         }
