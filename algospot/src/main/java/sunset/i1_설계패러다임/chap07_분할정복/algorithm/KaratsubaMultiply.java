@@ -98,12 +98,14 @@ public class KaratsubaMultiply {
             );
 
             if (endIdx - startIdx + 1 <= threshold) {
-                byte[] result = DecimalByteArrayCalculator.multiply(aNumber, bNumber);
+                byte[] targetA = DecimalByteArrayUtils.copy(aNumber, startIdx, endIdx);
+                byte[] targetB = DecimalByteArrayUtils.copy(bNumber, startIdx, endIdx);
+                byte[] result = DecimalByteArrayCalculator.multiply(targetA, targetB);
                 logForDebug(
                         String.format("Step %d 결과(thredhold 이하라 그냥 곱셈을 합니다): a%s * b%s = %s",
                                 recursiveDepth,
-                                DecimalByteArrayUtils.toString(aNumber),
-                                DecimalByteArrayUtils.toString(bNumber),
+                                DecimalByteArrayUtils.toString(targetA),
+                                DecimalByteArrayUtils.toString(targetB),
                                 DecimalByteArrayUtils.toString(result))
                 );
                 logForDebug(String.format("---------------------- Step %d 종료 ----------------------\n", recursiveDepth--));
