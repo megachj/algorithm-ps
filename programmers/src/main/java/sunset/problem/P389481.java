@@ -2,6 +2,12 @@ package sunset.problem;
 
 import java.util.Arrays;
 
+/**
+ * 문제 유형: 알파벳과 숫자 대응<br>
+ * 난이도: lv3<br>
+ *
+ * @see <a href = "https://school.programmers.co.kr/learn/courses/30/lessons/389481">링크</a>
+ */
 public class P389481 {
 
     public static void main(String[] args) {
