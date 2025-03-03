@@ -28,3 +28,4 @@ rootProject.name = "algorithm-ps"
 include("algospot")
 include("baekjoon")
 include("programmers")
+include("leetcode")
