@@ -7,10 +7,10 @@ import java.util.List;
  *
  * @see <a href="https://leetcode.com/problems/combinations/description/">링크</a>
  */
-public class P77_Combinations {
+public class P0077_Combinations {
 
     public static void main(String[] args) {
-        Solution solution = new P77_Combinations().new Solution();
+        Solution solution = new P0077_Combinations().new Solution();
         List<List<Integer>> answer = solution.combine(1, 1);
         System.out.println(answer);
     }

@@ -1,19 +1,17 @@
 package sunset.leetcode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  *
- * @see <a href="https://leetcode.com/problems/permutations/">링크</a>
+ * @see <a href="https://leetcode.com/problems/permutations-ii/description/">링크</a>
  */
-public class P46_Permutations {
+public class P0047_Permutations2 {
 
     public static void main(String[] args) {
-        Solution solution = new P46_Permutations().new Solution();
-        List<List<Integer>> results = solution.permute(new int[]{1, 2, 3});
+        Solution solution = new P0047_Permutations2().new Solution();
+        List<List<Integer>> results = solution.permuteUnique(new int[]{1, 1, 2});
         System.out.println(results);
     }
 
@@ -26,34 +24,29 @@ public class P46_Permutations {
         private boolean[] visited;
         private int[] permutation;
 
-        private List<List<Integer>> results;
+        private Set<List<Integer>> results;
 
-        /**
-         *
-         * @param nums nums.length [1, 6]
-         * @return
-         */
-        public List<List<Integer>> permute(int[] nums) {
+        public List<List<Integer>> permuteUnique(int[] nums) {
             this.nums = nums;
             this.visited = new boolean[nums.length];
-            this.permutation = new int[nums.length];
-            this.results = new ArrayList<>(720); // 6!
-
             for (int i = 0; i < nums.length; ++i) {
-                visited[i] = false;
-                permutation[i] = NOT;
+                this.visited[i] = false;
             }
 
+            this.permutation = new int[nums.length];
+            for (int i = 0; i < nums.length; ++i) {
+                this.permutation[i] = NOT;
+            }
+
+            this.results = new HashSet<>();
             find(0);
 
-            return results;
+            return new ArrayList<>(results);
         }
 
         private void find(int targetIdx) {
-            // 순열을 다 찾았다면
-            if (targetIdx >= permutation.length) {
+            if (targetIdx >= nums.length) {
                 addResult();
-                return;
             }
 
             for (int i = 0; i < nums.length; ++i) {

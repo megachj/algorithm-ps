@@ -8,10 +8,10 @@ import java.util.List;
  *
  * @see <a href="https://leetcode.com/problems/next-permutation/description/">링크</a>
  */
-public class P31_NextPermutation {
+public class P0031_NextPermutation {
 
     public static void main(String[] args) {
-        Solution solution = new P31_NextPermutation().new Solution();
+        Solution solution = new P0031_NextPermutation().new Solution();
         int[] nums = new int[]{1, 2, 3};
         solution.nextPermutation(nums);
         System.out.println(Arrays.toString(nums));
