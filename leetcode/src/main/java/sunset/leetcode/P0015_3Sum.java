@@ -163,25 +163,17 @@ public class P0015_3Sum {
                     int sum = nums[i] + nums[left] + nums[right];
                     if (sum == 0) {
                         results.add(Arrays.asList(nums[i], nums[left], nums[right]));
-                        int currentLeftValue = nums[left];
-                        while (currentLeftValue == nums[left] && left < right) {
-                            left++;
-                        }
 
-                        int currentRightValue = nums[right];
-                        while (currentRightValue == nums[right] && left < right) {
-                            right--;
-                        }
+                        while (left < right && nums[left+1] == nums[left]) left++;
+                        while (left < right && nums[right-1] == nums[right]) right--;
+                        left++;
+                        right--;
                     } else if (sum < 0) {
-                        int currentLeftValue = nums[left];
-                        while (currentLeftValue == nums[left] && left < right) {
-                            left++;
-                        }
+                        while (left < right && nums[left+1] == nums[left]) left++;
+                        left++;
                     } else {
-                        int currentRightValue = nums[right];
-                        while (currentRightValue == nums[right] && left < right) {
-                            right--;
-                        }
+                        while (left < right && nums[right-1] == nums[right]) right--;
+                        right--;
                     }
                 }
             }
