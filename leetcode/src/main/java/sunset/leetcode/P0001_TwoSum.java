@@ -17,6 +17,7 @@ public class P0001_TwoSum {
      * 설명: 브루트포스로 2중 for loop 을 통해서 답을 구한다.<br>
      * - 시간복잡도: O(n^2)<br>
      * - 공간복잡도: O(1)<br>
+     * - 결과: 50ms / 44.6MB<br>
      */
     class Solution {
         public int[] twoSum(int[] nums, int target) {
@@ -37,6 +38,7 @@ public class P0001_TwoSum {
      * 설명: Map 에 각 숫자를 넣어두고, Map 에서 조회해서 찾는다.<br>
      * - 시간복잡도: O(n)<br>
      * - 공간복잡도: O(n)<br>
+     * - 결과: 4ms / 45.2MB<br>
      */
     class Solution1 {
         public int[] twoSum(int[] nums, int target) {

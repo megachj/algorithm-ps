@@ -9,6 +9,12 @@ public class P0005_LongestPalindromicSubstring {
         System.out.println(output);
     }
 
+    /**
+     * 설명: 조금 최적화한 브루트포스 방법. 최대 3중 루프로 예상된다.<br>
+     * - 시간복잡도: O(n^3)<br>
+     * - 공간복잡도: O(1)<br>
+     * - 결과: 166ms / 42.1MB<br>
+     */
     class Solution {
         public String longestPalindrome(String s) {
             String maxPalindrome = "";
@@ -48,6 +54,61 @@ public class P0005_LongestPalindromicSubstring {
             }
 
             return palindrome;
+        }
+    }
+
+    /**
+     * 설명: 슬라이딩 + 투포인터를 활용해 최대 팰린드롬을 구한다.<br>
+     * - 시간복잡도: O(n^2)<br>
+     * - 공간복잡도: O(1)<br>
+     * - 결과: 18ms / 42.5MB<br>
+     */
+    class Solution1 {
+        public String longestPalindrome(String s) {
+            int maxLength = 1;
+            int startIdx = -1;
+            int endIdx = -1;
+
+            for (int i = 0; i < s.length(); ++i) {
+                // 짝수 투포인터
+                int left = i;
+                int right = i+1;
+                while (left >= 0 && right < s.length()) {
+                    if (s.charAt(left) != s.charAt(right)) {
+                        break;
+                    }
+                    left--;
+                    right++;
+                }
+                int palindromeLength = right - left - 1;
+                if (maxLength < palindromeLength) {
+                    maxLength = palindromeLength;
+                    startIdx = left + 1;
+                    endIdx = right - 1;
+                }
+
+                // 홀수 투포인터(1 제외)
+                left = i;
+                right = i+2;
+                while (left >= 0 && right < s.length()) {
+                    if (s.charAt(left) != s.charAt(right)) {
+                        break;
+                    }
+                    left--;
+                    right++;
+                }
+                palindromeLength = right - left - 1;
+                if (maxLength < palindromeLength) {
+                    maxLength = palindromeLength;
+                    startIdx = left + 1;
+                    endIdx = right - 1;
+                }
+            }
+            if (maxLength > 1) {
+                return s.substring(startIdx, endIdx + 1);
+            } else {
+                return s.substring(0, 1);
+            }
         }
     }
 }
