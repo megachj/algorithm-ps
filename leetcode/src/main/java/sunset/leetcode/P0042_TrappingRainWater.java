@@ -76,7 +76,7 @@ public class P0042_TrappingRainWater {
      * 설명: 투포인터를 이용한다.<br>
      * - 시간복잡도: O(n)<br>
      * - 공간복잡도: O(1)<br>
-     * - 결과: 0ms / 46.74MB<br>
+     * - 결과: 0ms / 47.00MB<br>
      */
     class Solution2 {
 
@@ -88,22 +88,14 @@ public class P0042_TrappingRainWater {
             int answer = 0; // 결과. 지금까지 가둔 물 높이
 
             while (leftPointer < rightPointer) {
-                int leftHeight = height[leftPointer];
-                int rightHeight = height[rightPointer];
+                maxLeftHeight = Math.max(maxLeftHeight, height[leftPointer]);
+                maxRightHeight = Math.max(maxRightHeight, height[rightPointer]);
 
-                if (leftHeight <= rightHeight) {
-                    if (leftHeight < maxLeftHeight) {
-                        int trapped = maxLeftHeight - leftHeight;
-                        if (trapped > 0) answer += trapped;
-                    }
-                    maxLeftHeight = Math.max(maxLeftHeight, leftHeight);
+                if (maxLeftHeight <= maxRightHeight) {
+                    answer += maxLeftHeight - height[leftPointer];
                     leftPointer++;
                 } else {
-                    if (rightHeight < maxRightHeight) {
-                        int trapped = maxRightHeight - rightHeight;
-                        if (trapped > 0) answer += trapped;
-                    }
-                    maxRightHeight = Math.max(maxRightHeight, rightHeight);
+                    answer += maxRightHeight - height[rightPointer];
                     rightPointer--;
                 }
             }
