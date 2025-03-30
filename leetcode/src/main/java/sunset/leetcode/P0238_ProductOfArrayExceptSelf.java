@@ -15,6 +15,12 @@ public class P0238_ProductOfArrayExceptSelf {
         System.out.println(Arrays.toString(output));
     }
 
+    /**
+     * 설명: 왼쪽부터 자신을 제외한 왼쪽모든값을 곱한 값과, 오른쪽부터 자신을 제외한 오른쪽 모든 값을 곱한 결과 리스트를 만들어 활용한다.
+     * - 시간복잡도: O(n)<br>
+     * - 공간복잡도: O(1)<br>
+     * - 결과: 2ms / 55.44MB<br>
+     */
     class Solution {
         public int[] productExceptSelf(int[] nums) {
             int[] result = new int[nums.length];
