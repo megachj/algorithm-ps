@@ -1,13 +1,17 @@
 package sunset.leetcode;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 
 public class P0042_TrappingRainWater {
 
     public static void main(String[] args) {
-//        int[] input = new int[]{0,1,0,2,1,0,1,3,2,1,2,1};
-        int[] input = new int[]{4, 3, 2, 1};
+        int[] input1 = new int[]{0,1,0,2,1,0,1,3,2,1,2,1}; // 6
+        int[] input2 = new int[]{4, 2, 0, 3, 2, 5}; // 9
+        int[] input3 = new int[]{4, 3, 2, 1}; // 0
 
+        int[] input = input1;
         Solution solution = new P0042_TrappingRainWater().new Solution();
         int result = solution.trap(input);
         System.out.println(result);
@@ -15,6 +19,10 @@ public class P0042_TrappingRainWater {
         Solution2 solution2 = new P0042_TrappingRainWater().new Solution2();
         int result2 = solution2.trap(input);
         System.out.println(result2);
+
+        Solution3 solution3 = new P0042_TrappingRainWater().new Solution3();
+        int result3 = solution3.trap(input);
+        System.out.println(result3);
     }
 
     /**
@@ -106,13 +114,78 @@ public class P0042_TrappingRainWater {
 
     /**
      * 설명: 스택을 이용한다.<br>
-     * - 시간복잡도: <br>
-     * - 공간복잡도: <br>
-     * - 결과: <br>
+     * - 시간복잡도: O(n)<br>
+     * - 공간복잡도: O(n)<br>
+     * - 결과: 5ms / 45.68MB<br>
      */
     class Solution3 {
 
-//        public int trap(int[] height) {
-//        }
+        private int[] height;
+
+        private int answer;
+        private int alreadyMaxHeight; // 이제까지 가장 높았던 높이
+        private int alreadyMaxIndex; // 이제까지 가장 높았던 인덱스
+        private int pointer;
+        private Deque<Integer> indexStack;
+
+        public int trap(int[] height) {
+            init(height);
+
+            while (pointer < height.length) {
+                // 스택이 비었으면 추가하고 포인터 이동한다.
+                if (indexStack.isEmpty()) {
+                    nextPointerAndMaybeSetMaxValue();
+                    continue;
+                }
+
+                // 스택에 있다면
+                int curHeight = height[pointer];
+                int targetHeight = Math.min(alreadyMaxHeight, curHeight);
+
+                while (!indexStack.isEmpty()) {
+                    int stackIndex = indexStack.peek();
+                    int stackHeight = height[stackIndex];
+                    // 스택에 있는게 현재 높이보다 크거나 같다면 끝낸다.
+                    if (stackHeight >= curHeight) {
+                        break;
+                    }
+
+                    // 스택에 있는게 현재 높이보다 작은 경우는 물이 가둬질 수 있는 가능성이 있다.
+                    indexStack.pop(); // 아까 안뺀거 빼둔다.
+
+                    // 스택에서 하나 더 전 값을 조회한다.
+                    Integer beforeIndex = indexStack.peek();
+
+                    // 하나 더 전 값이 없다면 물이 가둬질 수 없으므로 끝낸다.
+                    if (beforeIndex == null) {
+                        break;
+                    }
+
+                    // 물 가둬진 것을 계산한다.
+                    answer += ((targetHeight - stackHeight) * (stackIndex - beforeIndex));
+                }
+
+                nextPointerAndMaybeSetMaxValue();
+            }
+
+            return answer;
+        }
+
+        private void init(int[] height) {
+            this.height = height;
+            this.answer = 0;
+            this.alreadyMaxHeight = 0; // 이제까지 가장 높았던 높이
+            this.alreadyMaxIndex = -1; // 이제까지 가장 높았던 인덱스
+            this.pointer = 0;
+            this.indexStack = new ArrayDeque<>();
+        }
+
+        private void nextPointerAndMaybeSetMaxValue() {
+            if (alreadyMaxHeight <= height[pointer]) {
+                alreadyMaxHeight = height[pointer];
+                alreadyMaxIndex = pointer;
+            }
+            indexStack.push(pointer++);
+        }
     }
 }
