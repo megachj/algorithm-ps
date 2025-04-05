@@ -16,7 +16,7 @@ public class P0021_MergeTwoSortedLists {
      * 설명: 재귀 함수를 이용해 두 리스트를 병합한다.
      * - 시간복잡도: O(n)<br>
      * - 공간복잡도: O(1)<br>
-     * - 결과: 0ms / 74.92MB<br>
+     * - 결과: 0ms / 42.47MB<br>
      */
     class Solution {
         public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
