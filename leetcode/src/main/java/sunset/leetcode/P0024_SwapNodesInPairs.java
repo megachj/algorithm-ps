@@ -65,7 +65,6 @@ public class P0024_SwapNodesInPairs {
         }
     }
 
-
     private static class ListNode {
         int val;
         ListNode next;
