@@ -12,7 +12,7 @@ public class P0092_ReverseLinkedList2 {
     }
 
     /**
-     * 설명<br>
+     * 설명: 풀이보지 않고 내가 푼것<br>
      * - 시간복잡도: O(n)<br>
      * - 공간복잡도: O(1)<br>
      * - 결과: 0ms / 41.51MB <br>
@@ -64,6 +64,19 @@ public class P0092_ReverseLinkedList2 {
             } else {
                 return rightPointer;
             }
+        }
+    }
+
+    /**
+     * 설명: 풀이 이해한 뒤 작성해보기<br>
+     * - 시간복잡도: <br>
+     * - 공간복잡도: <br>
+     * - 결과: ms / MB <br>
+     */
+    class Solution2 {
+        public ListNode reverseBetween(ListNode head, int left, int right) {
+            // TODO
+            return null;
         }
     }
 
