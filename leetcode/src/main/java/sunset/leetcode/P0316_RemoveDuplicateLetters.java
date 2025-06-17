@@ -12,7 +12,7 @@ public class P0316_RemoveDuplicateLetters {
 
     /**
      * 설명: 스택을 이용한 풀이. 책보고 구현하였음.
-     * - 시간복잡도: O()<br>
+     * - 시간복잡도: O(n^2)?<br>
      * - 공간복잡도: O(n)<br>
      * - 결과: 8ms / 43.25MB<br>
      */
@@ -78,15 +78,28 @@ public class P0316_RemoveDuplicateLetters {
     }
 
     /**
-     * 설명: 재귀를 이용해서 풀이해보자.
-     * - 시간복잡도: O()<br>
+     * 설명: 재귀를 이용해서 풀이해보자. 직접 풀지는 못하고 책보고 풀었음.
+     * - 시간복잡도: O(n^2)<br>
      * - 공간복잡도: O()<br>
-     * - 결과: ms / MB<br>
+     * - 결과: 61ms / 45.49MB<br>
      */
     class Solution2 {
         public String removeDuplicateLetters(String s) {
-            // TODO(sunset)
-            return null;
+            for (char c : toSortedSet(s)) {
+                String suffix = s.substring(s.indexOf(c));
+                if (toSortedSet(s).equals(toSortedSet(suffix))) {
+                    return c + removeDuplicateLetters(suffix.replace(String.valueOf(c), ""));
+                }
+            }
+            return "";
+        }
+
+        private Set<Character> toSortedSet(String s) {
+            Set<Character> set = new TreeSet<>(Character::compareTo);
+            for (int i = 0; i < s.length(); ++i) {
+                set.add(s.charAt(i));
+            }
+            return set;
         }
     }
 }
