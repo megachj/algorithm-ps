@@ -1,5 +1,7 @@
 package sunset.leetcode;
 
+import sunset.leetcode.listnode.ListNode;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -149,23 +151,6 @@ public class P0234_PalindromeLinkedList {
             }
 
             return first;
-        }
-    }
-
-    private static class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode() {
-        }
-
-        ListNode(int val) {
-            this.val = val;
-        }
-
-        ListNode(int val, ListNode next) {
-            this.val = val;
-            this.next = next;
         }
     }
 }

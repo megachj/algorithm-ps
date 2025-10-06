@@ -1,10 +1,15 @@
 package sunset.leetcode;
 
+import sunset.leetcode.listnode.ListNode;
+
+import static sunset.leetcode.listnode.ListNodeUtils.convertToListNode;
+import static sunset.leetcode.listnode.ListNodeUtils.printListNode;
+
 public class P0328_OddEvenLinkedList {
 
     public static void main(String[] args) {
         int[] inputList1 = new int[] {1, 2, 3, 4, 5, 6};
-        ListNode list1 = makeInput(inputList1);
+        ListNode list1 = convertToListNode(inputList1);
 
         ListNode result = new P0328_OddEvenLinkedList().new Solution().oddEvenList(list1);
         printListNode(result);
@@ -51,40 +56,6 @@ public class P0328_OddEvenLinkedList {
 
         private boolean isLastOddOrEven(ListNode pointer) {
             return pointer.next == null || pointer.next.next == null;
-        }
-    }
-
-    private static ListNode makeInput(int[] inputs) {
-        ListNode head = new ListNode(inputs[0]);
-        ListNode pointer = head;
-        for (int i = 1; i < inputs.length; ++i) {
-            pointer.next = new ListNode(inputs[i]);
-            pointer = pointer.next;
-        }
-        return head;
-    }
-
-    private static void printListNode(ListNode listNode) {
-        while (listNode != null) {
-            System.out.printf("%d, ", listNode.val);
-            listNode = listNode.next;
-        }
-    }
-
-    private static class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode() {
-        }
-
-        ListNode(int val) {
-            this.val = val;
-        }
-
-        ListNode(int val, ListNode next) {
-            this.val = val;
-            this.next = next;
         }
     }
 }

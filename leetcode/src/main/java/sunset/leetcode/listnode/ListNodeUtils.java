@@ -2,7 +2,7 @@ package sunset.leetcode.listnode;
 
 public class ListNodeUtils {
 
-    public static ListNode convertToListNodeArray(int[] inputs) {
+    public static ListNode convertToListNode(int[] inputs) {
         if (inputs == null || inputs.length == 0) {
             return null;
         }
@@ -23,7 +23,7 @@ public class ListNodeUtils {
 
         ListNode[] listNodeArray = new ListNode[inputs.length];
         for (int i = 0; i < inputs.length; ++i) {
-            listNodeArray[i] = convertToListNodeArray(inputs[i]);
+            listNodeArray[i] = convertToListNode(inputs[i]);
         }
         return listNodeArray;
     }
