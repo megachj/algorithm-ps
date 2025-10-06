@@ -13,8 +13,8 @@ fun main(args: Array<String>) {
 
 fun multiply(aNumber: String, bNumber: String): String {
     val n: Int = max(aNumber.length, bNumber.length)
-    val a = numberStringToByteArray(aNumber, n);
-    val b = numberStringToByteArray(bNumber, n);
+    val a = numberStringToByteArray(aNumber, n)
+    val b = numberStringToByteArray(bNumber, n)
 
     val result: ByteArray = if (isGreaterOrEqual(a, b)) {
         solveDivideConquer(a, DividableRange.of(0, n), b, DividableRange.of(0, n))
@@ -55,7 +55,10 @@ private fun isGreaterOrEqual(a: ByteArray, b: ByteArray): Boolean {
 }
 
 private fun solveDivideConquer(
-    a: ByteArray, aRange: DividableRange, b: ByteArray, bRange: DividableRange
+    a: ByteArray,
+    aRange: DividableRange,
+    b: ByteArray,
+    bRange: DividableRange
 ): ByteArray {
     val aRangeDividable: Boolean = aRange.isDividable
 
@@ -141,8 +144,12 @@ private fun upSizing(a: ByteArray, n: Int): ByteArray {
  * a + b 연산을 한다.
  */
 private fun plusBytes(
-    a: ByteArray, aStart: Int, aEndExclusive: Int,
-    b: ByteArray, bStart: Int, bEndExclusive: Int
+    a: ByteArray,
+    aStart: Int,
+    aEndExclusive: Int,
+    b: ByteArray,
+    bStart: Int,
+    bEndExclusive: Int
 ): ByteArray {
     val aLength = aEndExclusive - aStart
     val bLength = bEndExclusive - bStart
@@ -168,8 +175,12 @@ private fun plusBytes(
  * 만약 b 가 더 큰 경우는 고려하지 않는다. 따라서 b 가 더 큰 경우는 자릿수에 음수가 포함되게 된다.<br></br>
  */
 private fun minusBytes(
-    a: ByteArray, aStart: Int, aEndExclusive: Int,
-    b: ByteArray, bStart: Int, bEndExclusive: Int
+    a: ByteArray,
+    aStart: Int,
+    aEndExclusive: Int,
+    b: ByteArray,
+    bStart: Int,
+    bEndExclusive: Int
 ): ByteArray {
     val aLength = aEndExclusive - aStart
     val bLength = bEndExclusive - bStart
