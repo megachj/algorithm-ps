@@ -53,7 +53,6 @@ public class P0200_NumberOfIslands {
                     if (dfs(i, j)) {
                         result++;
                     }
-
                 }
             }
 
