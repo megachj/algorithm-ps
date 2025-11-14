@@ -1,4 +1,4 @@
-package sunset.leetcode.listnode;
+package sunset.leetcode.support.listnode;
 
 public class ListNode {
     public int val;

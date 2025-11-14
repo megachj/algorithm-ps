@@ -1,9 +1,9 @@
 package sunset.leetcode;
 
-import sunset.leetcode.listnode.ListNode;
+import sunset.leetcode.support.listnode.ListNode;
 
-import static sunset.leetcode.listnode.ListNodeUtils.convertToListNode;
-import static sunset.leetcode.listnode.ListNodeUtils.printListNode;
+import static sunset.leetcode.support.listnode.ListNodeUtils.convertToListNode;
+import static sunset.leetcode.support.listnode.ListNodeUtils.printListNode;
 
 public class P0092_ReverseLinkedList2 {
 

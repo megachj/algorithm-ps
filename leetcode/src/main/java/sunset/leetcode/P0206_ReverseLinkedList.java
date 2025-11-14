@@ -1,8 +1,8 @@
 package sunset.leetcode;
 
-import sunset.leetcode.listnode.ListNode;
+import sunset.leetcode.support.listnode.ListNode;
 
-import static sunset.leetcode.listnode.ListNodeUtils.convertToListNode;
+import static sunset.leetcode.support.listnode.ListNodeUtils.convertToListNode;
 
 public class P0206_ReverseLinkedList {
 
