@@ -1,4 +1,4 @@
-package sunset.leetcode;
+package sunset.leetcode.datastructure;
 
 /**
  * 데크(Double-Ended Queue) ADT

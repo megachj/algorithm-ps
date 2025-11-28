@@ -1,4 +1,4 @@
-package sunset.leetcode;
+package sunset.leetcode.datastructure;
 
 /**
  * 우선순위 큐 ADT
