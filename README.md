@@ -23,3 +23,9 @@ System.out.println(Runtime.version());
 프로그래머스 문제들을 풀고 정리해두도록 한다.
 * 언어: 자바14
 * 기타: 타 라이브러리 사용X
+
+# 자바 버전 세팅
+sdkman 을 이용해서 동적으로 변환해서 사용할 수 있다.
+* 윈도우 사용법 https://kimvampa.tistory.com/308
+  * 윈도우에서 intellij 터미널을 git bash 로 사용하면 편하다.
+
