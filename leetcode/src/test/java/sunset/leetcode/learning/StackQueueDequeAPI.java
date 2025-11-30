@@ -1,4 +1,4 @@
-package sunset.leetcode.datastructure;
+package sunset.leetcode.learning;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
