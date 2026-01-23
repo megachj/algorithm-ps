@@ -17,6 +17,10 @@ public class P0027_CourseSchedule {
         System.out.println(result);
     }
 
+    /**
+     * 시간복잡도: O(|V||E|)
+     * 결과: 1539ms / 49.53MB
+     */
     class Solution {
         private int numCourses;
         // startVertex: [endVertex, ...]
