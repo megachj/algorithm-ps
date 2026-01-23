@@ -33,7 +33,7 @@ public class P0027_CourseSchedule {
             visitedEdge = makeVisitedEdge(prerequisites);
 
             for (Integer initVertex: graph.keySet()) {
-                if (existsCircle(initVertex)) {
+                if (existsCycle(initVertex)) {
                     return false;
                 }
             }
@@ -67,7 +67,7 @@ public class P0027_CourseSchedule {
                     ));
         }
 
-        private boolean existsCircle(int initVertex) {
+        private boolean existsCycle(int initVertex) {
             List<Integer> nextVertexList = graph.get(initVertex);
             if (nextVertexList == null) {
                 return false;
@@ -78,14 +78,14 @@ public class P0027_CourseSchedule {
             }
 
             for (Integer nextVertex: nextVertexList) {
-                if (dfsAndExistsCircle(initVertex, nextVertex)) {
+                if (dfsAndExistsCycle(initVertex, nextVertex)) {
                     return true;
                 }
             }
             return false;
         }
 
-        private boolean dfsAndExistsCircle(int initVertex, int startVertex) {
+        private boolean dfsAndExistsCycle(int initVertex, int startVertex) {
             if (initVertex == startVertex) {
                 return true;
             }
@@ -98,7 +98,7 @@ public class P0027_CourseSchedule {
                 List<Integer> edge = List.of(startVertex, nextVertex);
                 if (!visitedEdge.get(edge)) {
                     visitedEdge.put(edge, true);
-                    if (dfsAndExistsCircle(initVertex, nextVertex)) {
+                    if (dfsAndExistsCycle(initVertex, nextVertex)) {
                         return true;
                     }
                 }
