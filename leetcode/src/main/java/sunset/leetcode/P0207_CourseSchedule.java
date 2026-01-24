@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class P0027_CourseSchedule {
+public class P0207_CourseSchedule {
 
     public static void main(String[] args) {
-        Solution solution = new P0027_CourseSchedule().new Solution();
+        Solution solution = new P0207_CourseSchedule().new Solution();
         int numCourses = NUM_COURSES_5;
         int[][] prerequisites = PREREQUISITES_5;
 
@@ -18,6 +18,10 @@ public class P0027_CourseSchedule {
     }
 
     /**
+     * 모든 정점에서 각각 해당 정점으로 돌아오는 경로가 있는지를 dfs 로 탐색한다.
+     * 이 알고리즘은 비효율적인데 이유는 예를들면 1번 정점에서 사이클확인하는 것이 2번 정점에서 사이클확인하는 것을 포함하더라도
+     * 따로따로 계산하고 있다. 그렇기 때문에 캐시를 사용할 수도 없어서 성능개선을 하려면 이부분을 모두 수정해야한다.
+     *
      * 시간복잡도: O(|V||E|)
      * 결과: 1539ms / 49.53MB
      */
