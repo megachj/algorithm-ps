@@ -4,6 +4,11 @@ import sunset.leetcode.support.datastructure.TreeNode;
 
 public class P0104_MaximumDepthOfBinaryTree {
 
+    /**
+     * - 시간복잡도: O(V)
+     * - 공간복잡도: O(1)
+     * - 결과: 0ms / 44.85MB
+     */
     class Solution {
         public int maxDepth(TreeNode root) {
             return depth(root, 1);
