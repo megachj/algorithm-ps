@@ -82,7 +82,7 @@ public class P01844 {
             if (visited[n-1][m-1] == WALL || visited[n-1][m-1] == NO_VISITED) {
                 return -1;
             } else {
-                return visited[n - 1][m - 1];
+                return visited[n-1][m-1];
             }
         }
     }
