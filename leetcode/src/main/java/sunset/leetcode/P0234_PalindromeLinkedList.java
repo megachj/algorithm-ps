@@ -1,6 +1,6 @@
 package sunset.leetcode;
 
-import sunset.leetcode.support.listnode.ListNode;
+import sunset.leetcode.support.datastructure.ListNode;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

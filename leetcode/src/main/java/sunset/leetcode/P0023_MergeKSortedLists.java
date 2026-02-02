@@ -1,12 +1,12 @@
 package sunset.leetcode;
 
-import sunset.leetcode.support.listnode.ListNode;
-import sunset.leetcode.support.listnode.ListNodeUtils;
+import sunset.leetcode.support.datastructure.ListNode;
+import sunset.leetcode.support.datastructure.ListNodeUtils;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import static sunset.leetcode.support.listnode.ListNodeUtils.printListNode;
+import static sunset.leetcode.support.datastructure.ListNodeUtils.printListNode;
 
 /**
  * N = lists.length <= 10^4

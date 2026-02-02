@@ -1,8 +1,8 @@
 package sunset.leetcode;
 
-import sunset.leetcode.support.listnode.ListNode;
+import sunset.leetcode.support.datastructure.ListNode;
 
-import static sunset.leetcode.support.listnode.ListNodeUtils.convertToListNode;
+import static sunset.leetcode.support.datastructure.ListNodeUtils.convertToListNode;
 
 public class P0021_MergeTwoSortedLists {
 

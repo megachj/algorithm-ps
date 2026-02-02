@@ -1,4 +1,4 @@
-package sunset.leetcode.support.listnode;
+package sunset.leetcode.support.datastructure;
 
 public class ListNodeUtils {
 
