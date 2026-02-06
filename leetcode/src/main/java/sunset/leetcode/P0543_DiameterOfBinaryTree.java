@@ -53,4 +53,33 @@ public class P0543_DiameterOfBinaryTree {
             return height;
         }
     }
+
+    /**
+     * - 시간복잡도: O(V)
+     * - 공간복잡도: O(1)
+     * - 결과: 0ms / 47.12MB
+     */
+    class Solution1 {
+        private int maxDiameter;
+
+        public int diameterOfBinaryTree(TreeNode root) {
+            maxDiameter = 0;
+
+            dfsHeight(root);
+
+            return maxDiameter;
+        }
+
+        private int dfsHeight(TreeNode node) {
+            if (node == null) {
+                return -1;
+            }
+
+            int leftHeight = dfsHeight(node.left);
+            int rightHeight = dfsHeight(node.right);
+
+            maxDiameter = Math.max(maxDiameter, leftHeight + rightHeight + 2);
+            return Math.max(leftHeight, rightHeight) + 1;
+        }
+    }
 }
