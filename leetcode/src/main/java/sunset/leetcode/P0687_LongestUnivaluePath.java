@@ -4,6 +4,11 @@ import sunset.leetcode.support.datastructure.TreeNode;
 
 public class P0687_LongestUnivaluePath {
 
+    /**
+     * - 시간복잡도: O(V)
+     * - 공간복잡도: O(1)
+     * - 결과: 3ms / 49.17MB
+     */
     class Solution {
         private int maxUnivaluePath;
 
