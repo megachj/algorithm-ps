@@ -158,4 +158,27 @@ public class P0617_MergeTwoBinaryTrees {
             return new TreeNode(tree.get(positions), left, right);
         }
     }
+
+    /**
+     * - 시간복잡도: O(V)
+     * - 공간복잡도: O(1)
+     * - 결과: 0ms / 46.97MB
+     */
+    class SolutionBook {
+
+        public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+            if (root1 == null) {
+                return root2;
+            }
+            if (root2 == null) {
+                return root1;
+            }
+
+            TreeNode mergeNode = new TreeNode(root1.val + root2.val);
+            mergeNode.left = mergeTrees(root1.left, root2.left);
+            mergeNode.right = mergeTrees(root1.right, root2.right);
+
+            return mergeNode;
+        }
+    }
 }
