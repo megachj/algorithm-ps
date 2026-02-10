@@ -23,9 +23,11 @@ public class P42628 {
     }
 
     /**
-     * 시간복잡도: O(nlogn)
-     * 공간복잡도: O(n)
-     * 결과: 73.51ms / 132MB
+     * TreeMap(BST 일종인 Red-Black Tree) 을 사용하여 풀이(직접 생각)
+     *
+     * - 시간복잡도: O(nlogn)
+     * - 공간복잡도: O(n)
+     * - 결과: 73.51ms / 132MB
      */
     class Solution {
 
@@ -64,6 +66,32 @@ public class P42628 {
             } else {
                 return new int[]{map.lastKey(), map.firstKey()};
             }
+        }
+    }
+
+    /**
+     * MinHeap, MaxHeap 두 개를 이용하여 풀이(책 해답 풀이)
+     * - 시간복잡도: ?
+     * - 공간복잡도: ?
+     * - 결과: ?ms / ?MB
+     */
+    class Solution1 {
+        public int[] solution(String[] operations) {
+            // TODO
+            return null;
+        }
+    }
+
+    /**
+     * 구간힙을 직접 구현하여 풀이(책 해답 풀이)
+     * - 시간복잡도: ?
+     * - 공간복잡도: ?
+     * - 결과: ?ms / ?MB
+     */
+    class Solution2 {
+        public int[] solution(String[] operations) {
+            // TODO
+            return null;
         }
     }
 }
