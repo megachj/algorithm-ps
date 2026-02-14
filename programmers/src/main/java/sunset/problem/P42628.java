@@ -2,6 +2,7 @@ package sunset.problem;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 public class P42628 {
@@ -17,13 +18,13 @@ public class P42628 {
     public static void main(String[] args) {
         String[] input = INPUT_2;
 
-        int[] result = new P42628().new Solution().solution(input);
+        int[] result = new P42628().new Solution1().solution(input);
 
         System.out.println("[" + result[0] + ", " + result[1] + "]");
     }
 
     /**
-     * TreeMap(BST 일종인 Red-Black Tree) 을 사용하여 풀이(직접 생각)
+     * TreeMap(BST 일종인 Red-Black Tree) 을 사용하여 풀이(직접 풀이)
      *
      * - 시간복잡도: O(nlogn)
      * - 공간복잡도: O(n)
@@ -71,19 +72,41 @@ public class P42628 {
 
     /**
      * MinHeap, MaxHeap 두 개를 이용하여 풀이(책 해답 풀이)
-     * - 시간복잡도: ?
-     * - 공간복잡도: ?
-     * - 결과: ?ms / ?MB
+     * - 시간복잡도: O(n^2)
+     * - 공간복잡도: O(n)
+     * - 결과: 84.05ms / 139MB
      */
     class Solution1 {
         public int[] solution(String[] operations) {
-            // TODO
-            return null;
+            PriorityQueue<Integer> minHeap = new PriorityQueue<>(Comparator.naturalOrder());
+            PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+            for(String operation: operations) {
+                String[] split = operation.split(" ");
+                String op = split[0];
+                int n = Integer.parseInt(split[1]);
+
+                if ("I".equals(op)) {
+                    minHeap.offer(n);
+                    maxHeap.offer(n);
+                } else {
+                    if (n == 1) {
+                        minHeap.remove(maxHeap.poll()); // PriorityQueue.remove(Object) 의 시간복잡도는 O(n) 이다.
+                    } else if (n == -1) {
+                        maxHeap.remove(minHeap.poll());
+                    }
+                }
+            }
+
+            if (minHeap.isEmpty()) {
+                return new int[]{0, 0};
+            } else {
+                return new int[]{maxHeap.peek(), minHeap.peek()};
+            }
         }
     }
 
     /**
-     * 구간힙을 직접 구현하여 풀이(책 해답 풀이)
+     * 인터벌 힙(구간 힙)을 직접 구현하여 풀이(책 해답 풀이)
      * - 시간복잡도: ?
      * - 공간복잡도: ?
      * - 결과: ?ms / ?MB
