@@ -1,9 +1,8 @@
 package sunset.problem;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
+import sunset.problem.datastructure.IntervalHeap;
+
+import java.util.*;
 
 public class P42628 {
 
@@ -113,8 +112,32 @@ public class P42628 {
      */
     class Solution2 {
         public int[] solution(String[] operations) {
-            // TODO
-            return null;
+            IntervalHeap<Integer> intervalHeap = new IntervalHeap<>();
+
+            for (String operation: operations) {
+                String[] split = operation.split(" ");
+                String op = split[0];
+                int n = Integer.parseInt(split[1]);
+
+                if ("I".equals(op)) {
+                    intervalHeap.add(n);
+                } else {
+                    if (n == 1) {
+                        intervalHeap.removeMax();
+                    } else if (n == -1) {
+                        intervalHeap.removeMin();
+                    }
+                }
+            }
+
+            List<Integer> interval = intervalHeap.getInterval();
+            if (interval.isEmpty()) {
+                return new int[]{0, 0};
+            } else if (interval.size() == 1) {
+                return new int[]{interval.get(0), interval.get(0)};
+            } else {
+                return new int[]{interval.get(1), interval.get(0)};
+            }
         }
     }
 }

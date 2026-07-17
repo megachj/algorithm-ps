@@ -1,6 +1,7 @@
 package sunset.problem.datastructure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class IntervalHeap<T extends Comparable<T>> {
@@ -11,11 +12,51 @@ public class IntervalHeap<T extends Comparable<T>> {
         elements = new ArrayList<>();
     }
 
+    public boolean isEmpty() {
+        return elements.isEmpty();
+    }
+
+    /**
+     * 구간을 조회한다.
+     *
+     * @return [] or [값] or [최솟값, 최댓값]
+     */
+    public List<T> getInterval() {
+        if (isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (elements.get(0).isPoint()) {
+            return Collections.singletonList(elements.get(0).getPoint());
+        }
+
+        return List.of(elements.get(0).getMin(), elements.get(0).getMax());
+    }
+
     public void add(T value) {
+        // 마지막 노드에 값 추가
         if (elements.isEmpty() || elements.get(elements.size() - 1).isInterval()) {
             elements.add(new Interval<>(value));
         } else {
             elements.get(elements.size() - 1).add(value);
+        }
+
+        // 선조들과 스왑
+        int childIndex = elements.size() - 1;
+        while (true) {
+            if (childIndex <= 0) {
+                break;
+            }
+
+            int parentIndex = childIndex % 2 == 1 ? childIndex / 2 : childIndex / 2 - 1;
+
+            Interval<T> child = elements.get(childIndex);
+            Interval<T> parent = elements.get(parentIndex);
+
+            if (!child.swapParent(parent)) {
+                break;
+            }
+            childIndex = parentIndex;
         }
     }
 
@@ -41,16 +82,16 @@ public class IntervalHeap<T extends Comparable<T>> {
         elements.get(0).add(lastLeafMin);
 
         // 자손들과 스왑
-        int index = 0;
+        int parentIndex = 0;
         while (true) {
-            if (index >= elements.size()) {
+            if (parentIndex >= elements.size()) {
                 break;
             }
 
-            Interval<T> parent = elements.get(index);
+            Interval<T> parent = elements.get(parentIndex);
 
-            int leftChildIndex = index * 2 + 1;
-            int rightChildIndex = index * 2 + 2;
+            int leftChildIndex = parentIndex * 2 + 1;
+            int rightChildIndex = parentIndex * 2 + 2;
 
             Interval<T> leftChild = leftChildIndex < elements.size() ? elements.get(leftChildIndex) : null;
             Interval<T> rightChild = rightChildIndex < elements.size() ? elements.get(rightChildIndex) : null;
@@ -59,9 +100,9 @@ public class IntervalHeap<T extends Comparable<T>> {
             if (result == SwapChildrenResult.NONE) {
                 break;
             } else if (result == SwapChildrenResult.LEFT) {
-                index = leftChildIndex;
+                parentIndex = leftChildIndex;
             } else {
-                index = rightChildIndex;
+                parentIndex = rightChildIndex;
             }
         }
     }
@@ -88,16 +129,16 @@ public class IntervalHeap<T extends Comparable<T>> {
         elements.get(0).add(lastLeafMax);
 
         // 자손들과 스왑
-        int index = 0;
+        int parentIndex = 0;
         while (true) {
-            if (index >= elements.size()) {
+            if (parentIndex >= elements.size()) {
                 break;
             }
 
-            Interval<T> parent = elements.get(index);
+            Interval<T> parent = elements.get(parentIndex);
 
-            int leftChildIndex = index * 2 + 1;
-            int rightChildIndex = index * 2 + 2;
+            int leftChildIndex = parentIndex * 2 + 1;
+            int rightChildIndex = parentIndex * 2 + 2;
 
             Interval<T> leftChild = leftChildIndex < elements.size() ? elements.get(leftChildIndex) : null;
             Interval<T> rightChild = rightChildIndex < elements.size() ? elements.get(rightChildIndex) : null;
@@ -106,9 +147,9 @@ public class IntervalHeap<T extends Comparable<T>> {
             if (result == SwapChildrenResult.NONE) {
                 break;
             } else if (result == SwapChildrenResult.LEFT) {
-                index = leftChildIndex;
+                parentIndex = leftChildIndex;
             } else {
-                index = rightChildIndex;
+                parentIndex = rightChildIndex;
             }
         }
     }
@@ -215,6 +256,21 @@ public class IntervalHeap<T extends Comparable<T>> {
                 min = null;
             }
             return result;
+        }
+
+        /**
+         *
+         * @param parent
+         * @return
+         */
+        public boolean swapParent(Interval<T> parent) {
+            ContainResult containResult = parent.contains(this);
+            if (containResult == ContainResult.CONTAINED) {
+                return false;
+            }
+
+            parent.swap(this);
+            return true;
         }
 
         /**
