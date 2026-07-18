@@ -64,7 +64,7 @@ public class IntervalHeap<T extends Comparable<T>> {
             Interval<T> child = getInterval(childIndex);
             Interval<T> parent = getInterval(parentIndex);
 
-            if (!child.swapParent(parent)) {
+            if (!child.compareAndSubstituteWithParent(parent)) {
                 break;
             }
             childIndex = parentIndex;
@@ -124,10 +124,10 @@ public class IntervalHeap<T extends Comparable<T>> {
             Interval<T> leftChild = leftChildIndex < size() ? getInterval(leftChildIndex) : null;
             Interval<T> rightChild = rightChildIndex < size() ? getInterval(rightChildIndex) : null;
 
-            SwapChildrenResult result = parent.swapChildren(leftChild, rightChild);
-            if (result == SwapChildrenResult.NONE) {
+            ChildrenSubstitutionResult result = parent.compareAndSubstituteWithChildren(leftChild, rightChild);
+            if (result == ChildrenSubstitutionResult.NONE) {
                 break;
-            } else if (result == SwapChildrenResult.LEFT) {
+            } else if (result == ChildrenSubstitutionResult.LEFT) {
                 parentIndex = leftChildIndex;
             } else {
                 parentIndex = rightChildIndex;
@@ -236,7 +236,7 @@ public class IntervalHeap<T extends Comparable<T>> {
         /**
          * 최솟값을 제거한다. 없으면 최댓값을 제거한다.
          *
-         * @return
+         * @return 제거된 값
          */
         public T removeMin() {
             T result;
@@ -253,7 +253,7 @@ public class IntervalHeap<T extends Comparable<T>> {
         /**
          * 최댓값을 제거한다. 없으면 최솟값을 제거한다.
          *
-         * @return
+         * @return 제거된 값
          */
         public T removeMax() {
             T result;
@@ -268,13 +268,14 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
 
         /**
+         * 부모 노드와 구간 포함관계를 비교하고 필요하면 교체한다.
          *
-         * @param parent
-         * @return
+         * @param parent 부모
+         * @return 교체됐는지 여부
          */
-        public boolean swapParent(Interval<T> parent) {
-            ContainResult containResult = parent.contains(this);
-            if (containResult == ContainResult.CONTAINED) {
+        public boolean compareAndSubstituteWithParent(Interval<T> parent) {
+            ContainRelation containResult = parent.contains(this);
+            if (containResult == ContainRelation.CONTAINED) {
                 return false;
             }
 
@@ -283,83 +284,83 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
 
         /**
-         * 부모와 자식들의 구간을 비교하고 필요하면 조정한다.
+         * 자식 노드들과 구간 포함관계를 비교하고 필요하면 교체한다.
          *
          * @param leftChild 왼쪽 자식
          * @param rightChild 오른쪽 자식
-         * @return 변경결과
+         * @return 교체된 결과
          */
-        public SwapChildrenResult swapChildren(Interval<T> leftChild, Interval<T> rightChild) {
+        public ChildrenSubstitutionResult compareAndSubstituteWithChildren(Interval<T> leftChild, Interval<T> rightChild) {
             // 자식이 없을때
             if (leftChild == null && rightChild == null) {
-                return SwapChildrenResult.NONE;
+                return ChildrenSubstitutionResult.NONE;
             }
 
             // 왼쪽 자식만 있을때(자식이 하나일 때)
             if (leftChild != null && rightChild == null) {
-                ContainResult containResult = contains(leftChild);
-                switch (containResult) {
+                ContainRelation leftContains = contains(leftChild);
+                switch (leftContains) {
                     case CONTAINED:
-                        return SwapChildrenResult.NONE;
+                        return ChildrenSubstitutionResult.NONE;
                     case MIN_EXCESS:
                     case MAX_EXCESS:
                         swap(leftChild);
-                        return SwapChildrenResult.LEFT;
+                        return ChildrenSubstitutionResult.LEFT;
                     default:
                         throw new RuntimeException();
                 }
             }
 
             // 자식이 둘 다 있을 때
-            ContainResult leftResult = contains(leftChild);
-            ContainResult rightResult = contains(rightChild);
+            ContainRelation leftContains = contains(leftChild);
+            ContainRelation rightContains = contains(rightChild);
 
-            if (leftResult == ContainResult.CONTAINED && rightResult == ContainResult.CONTAINED) {
-                return SwapChildrenResult.NONE;
+            if (leftContains == ContainRelation.CONTAINED && rightContains == ContainRelation.CONTAINED) {
+                return ChildrenSubstitutionResult.NONE;
             }
-            else if (leftResult != ContainResult.CONTAINED && rightResult == ContainResult.CONTAINED) {
+            else if (leftContains != ContainRelation.CONTAINED && rightContains == ContainRelation.CONTAINED) {
                 swap(leftChild);
-                return SwapChildrenResult.LEFT;
+                return ChildrenSubstitutionResult.LEFT;
             }
-            else if (leftResult == ContainResult.CONTAINED && rightResult != ContainResult.CONTAINED) {
+            else if (leftContains == ContainRelation.CONTAINED && rightContains != ContainRelation.CONTAINED) {
                 swap(rightChild);
-                return SwapChildrenResult.RIGHT;
+                return ChildrenSubstitutionResult.RIGHT;
             }
             else {
-                if (leftResult == ContainResult.MIN_EXCESS) {
+                if (leftContains == ContainRelation.MIN_EXCESS) {
                     T leftMin = leftChild.getMin();
                     T rightMin = rightChild.getMin();
                     if (leftMin.compareTo(rightMin) <= 0) {
                         swap(leftChild);
-                        return SwapChildrenResult.LEFT;
+                        return ChildrenSubstitutionResult.LEFT;
                     } else {
                         swap(rightChild);
-                        return SwapChildrenResult.RIGHT;
+                        return ChildrenSubstitutionResult.RIGHT;
                     }
                 } else {
                     T leftMax = leftChild.getMax();
                     T rightMax = rightChild.getMax();
                     if (leftMax.compareTo(rightMax) >= 0) {
                         swap(leftChild);
-                        return SwapChildrenResult.LEFT;
+                        return ChildrenSubstitutionResult.LEFT;
                     } else {
                         swap(rightChild);
-                        return SwapChildrenResult.RIGHT;
+                        return ChildrenSubstitutionResult.RIGHT;
                     }
                 }
             }
         }
 
-        private ContainResult contains(Interval<T> child) {
+        private ContainRelation contains(Interval<T> child) {
             if (min.compareTo(child.getMin()) > 0) {
-                return ContainResult.MIN_EXCESS;
+                return ContainRelation.MIN_EXCESS;
             }
 
             if (max.compareTo(child.getMax()) < 0) {
-                return ContainResult.MAX_EXCESS;
+                return ContainRelation.MAX_EXCESS;
             }
 
-            return ContainResult.CONTAINED;
+            return ContainRelation.CONTAINED;
         }
 
         private void swap(Interval<T> child) {
@@ -393,17 +394,17 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
     }
 
-    enum ContainResult {
+    enum ContainRelation {
+        // 포함
+        CONTAINED,
         // 최솟값 초과
         MIN_EXCESS,
         // 최댓값 초과
         MAX_EXCESS,
-        // 포함
-        CONTAINED,
         ;
     }
 
-    enum SwapChildrenResult {
+    enum ChildrenSubstitutionResult {
         LEFT,
         RIGHT,
         NONE,
