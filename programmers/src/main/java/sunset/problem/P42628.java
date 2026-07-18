@@ -106,9 +106,9 @@ public class P42628 {
 
     /**
      * 인터벌 힙(구간 힙)을 직접 구현하여 풀이(책 해답 풀이)
-     * - 시간복잡도: ?
-     * - 공간복잡도: ?
-     * - 결과: ?ms / ?MB
+     * - 시간복잡도: O(nlogn)
+     * - 공간복잡도: O(n)
+     * - 결과: 68.81ms / 141MB
      */
     class Solution2 {
         public int[] solution(String[] operations) {
