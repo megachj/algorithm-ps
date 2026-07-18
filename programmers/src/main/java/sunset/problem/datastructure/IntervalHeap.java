@@ -3,6 +3,7 @@ package sunset.problem.datastructure;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 public class IntervalHeap<T extends Comparable<T>> {
 
@@ -74,51 +75,34 @@ public class IntervalHeap<T extends Comparable<T>> {
      * 최솟값을 제거한다.
      */
     public void removeMin() {
-        remove(true);
+        remove(Interval::removeMin);
     }
 
     /**
      * 최댓값을 제거한다.
      */
     public void removeMax() {
-        remove(false);
+        remove(Interval::removeMax);
     }
 
-    private void remove(boolean isMin) {
+    private void remove(Function<Interval<T>, T> removeFunction) {
         if (isEmpty()) {
             return;
         }
 
         if (size() == 1) {
-            Interval<T> root = rootInterval();
-            if (isMin) {
-                root.removeMin();
-            } else {
-                root.removeMax();
-            }
-
+            removeFunction.apply(rootInterval());
             if (rootInterval().isEmpty()) {
                 elements.remove(0);
             }
             return;
         }
 
-        // 루트 노드 값 제거 & 마지막 값 루트로 가져오기
-        Interval<T> root = rootInterval();
-        if (isMin) {
-            root.removeMin();
-        } else {
-            root.removeMax();
-        }
+        // 루트 노드 값 제거
+        removeFunction.apply(rootInterval());
 
-        Interval<T> last = lastInterval();
-        T lastValue;
-        if (isMin) {
-            lastValue = last.removeMin();
-        } else {
-            lastValue = last.removeMax();
-        }
-
+        // 마지막 노드 값 루트로 이동
+        T lastValue = removeFunction.apply(lastInterval());
         if (lastInterval().isEmpty()) {
             elements.remove(lastIndex());
         }
