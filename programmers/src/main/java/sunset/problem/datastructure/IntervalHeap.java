@@ -74,76 +74,55 @@ public class IntervalHeap<T extends Comparable<T>> {
      * 최솟값을 제거한다.
      */
     public void removeMin() {
-        if (isEmpty()) {
-            return;
-        }
-
-        if (size() == 1) {
-            getInterval(0).removeMin();
-            if (getInterval(0).isEmpty()) {
-                elements.remove(0);
-            }
-            return;
-        }
-
-        // 루트 노드 최솟값 제거 & 마지막 값 루트로 가져오기
-        getInterval(0).removeMin();
-        T lastLeafMin = getInterval(lastIndex()).removeMin();
-        if (getInterval(lastIndex()).isEmpty()) {
-            elements.remove(lastIndex());
-        }
-        getInterval(0).add(lastLeafMin);
-
-        // 자손들과 구간 포함여부 확인하며 교환 반복
-        int parentIndex = 0;
-        while (true) {
-            if (parentIndex >= size()) {
-                break;
-            }
-
-            Interval<T> parent = getInterval(parentIndex);
-
-            int[] childrenIndex = calcChildrenIndex(parentIndex);
-            int leftChildIndex = childrenIndex[0];
-            int rightChildIndex = childrenIndex[1];
-
-            Interval<T> leftChild = leftChildIndex < size() ? getInterval(leftChildIndex) : null;
-            Interval<T> rightChild = rightChildIndex < size() ? getInterval(rightChildIndex) : null;
-
-            SwapChildrenResult result = parent.swapChildren(leftChild, rightChild);
-            if (result == SwapChildrenResult.NONE) {
-                break;
-            } else if (result == SwapChildrenResult.LEFT) {
-                parentIndex = leftChildIndex;
-            } else {
-                parentIndex = rightChildIndex;
-            }
-        }
+        remove(true);
     }
 
     /**
      * 최댓값을 제거한다.
      */
     public void removeMax() {
+        remove(false);
+    }
+
+    private void remove(boolean isMin) {
         if (isEmpty()) {
             return;
         }
 
         if (size() == 1) {
-            getInterval(0).removeMax();
+            Interval<T> root = getInterval(0);
+            if (isMin) {
+                root.removeMin();
+            } else {
+                root.removeMax();
+            }
+
             if (getInterval(0).isEmpty()) {
                 elements.remove(0);
             }
             return;
         }
 
-        // 루트 노드 최댓값 제거 & 마지막 값 루트로 가져오기
-        getInterval(0).removeMax();
-        T lastLeafMax = getInterval(lastIndex()).removeMax();
+        // 루트 노드 값 제거 & 마지막 값 루트로 가져오기
+        Interval<T> root = getInterval(0);
+        if (isMin) {
+            root.removeMin();
+        } else {
+            root.removeMax();
+        }
+
+        Interval<T> lastLeaf = getInterval(lastIndex());
+        T lastLeafValue;
+        if (isMin) {
+            lastLeafValue = lastLeaf.removeMin();
+        } else {
+            lastLeafValue = lastLeaf.removeMax();
+        }
+
         if (getInterval(lastIndex()).isEmpty()) {
             elements.remove(lastIndex());
         }
-        getInterval(0).add(lastLeafMax);
+        getInterval(0).add(lastLeafValue);
 
         // 자손들과 구간 포함여부 확인하며 교환 반복
         int parentIndex = 0;
@@ -153,6 +132,7 @@ public class IntervalHeap<T extends Comparable<T>> {
             }
 
             Interval<T> parent = getInterval(parentIndex);
+
             int[] childrenIndex = calcChildrenIndex(parentIndex);
             int leftChildIndex = childrenIndex[0];
             int rightChildIndex = childrenIndex[1];
