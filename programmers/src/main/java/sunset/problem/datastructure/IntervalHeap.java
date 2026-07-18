@@ -12,6 +12,11 @@ public class IntervalHeap<T extends Comparable<T>> {
         elements = new ArrayList<>();
     }
 
+    /**
+     * 빈 값인지 확인한다.
+     *
+     * @return 빈 값 여부
+     */
     public boolean isEmpty() {
         return elements.isEmpty();
     }
@@ -26,32 +31,37 @@ public class IntervalHeap<T extends Comparable<T>> {
             return Collections.emptyList();
         }
 
-        if (elements.get(0).isPoint()) {
-            return Collections.singletonList(elements.get(0).getPoint());
+        if (getInterval(0).isPoint()) {
+            return Collections.singletonList(getInterval(0).getPoint());
         }
 
-        return List.of(elements.get(0).getMin(), elements.get(0).getMax());
+        return List.of(getInterval(0).getMin(), getInterval(0).getMax());
     }
 
+    /**
+     * 값을 추가한다.
+     *
+     * @param value 값
+     */
     public void add(T value) {
         // 마지막 노드에 값 추가
-        if (elements.isEmpty() || elements.get(elements.size() - 1).isInterval()) {
+        if (isEmpty() || getInterval(lastIndex()).isInterval()) {
             elements.add(new Interval<>(value));
         } else {
-            elements.get(elements.size() - 1).add(value);
+            getInterval(lastIndex()).add(value);
         }
 
-        // 선조들과 스왑
-        int childIndex = elements.size() - 1;
+        // 선조들과 구간 포함여부 확인하며 교환 반복
+        int childIndex = lastIndex();
         while (true) {
             if (childIndex <= 0) {
                 break;
             }
 
-            int parentIndex = childIndex % 2 == 1 ? childIndex / 2 : childIndex / 2 - 1;
+            int parentIndex = calcParentIndex(childIndex);
 
-            Interval<T> child = elements.get(childIndex);
-            Interval<T> parent = elements.get(parentIndex);
+            Interval<T> child = getInterval(childIndex);
+            Interval<T> parent = getInterval(parentIndex);
 
             if (!child.swapParent(parent)) {
                 break;
@@ -60,41 +70,45 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
     }
 
+    /**
+     * 최솟값을 제거한다.
+     */
     public void removeMin() {
-        if (elements.isEmpty()) {
+        if (isEmpty()) {
             return;
         }
 
-        if (elements.size() == 1) {
-            elements.get(0).removeMin();
-            if (elements.get(0).isEmpty()) {
+        if (size() == 1) {
+            getInterval(0).removeMin();
+            if (getInterval(0).isEmpty()) {
                 elements.remove(0);
             }
             return;
         }
 
-        // 루트 노드 min 값 제거 & 마지막 값 루트로 가져오기
-        elements.get(0).removeMin();
-        T lastLeafMin = elements.get(elements.size() - 1).removeMin();
-        if (elements.get(elements.size() - 1).isEmpty()) {
-            elements.remove(elements.size() - 1);
+        // 루트 노드 최솟값 제거 & 마지막 값 루트로 가져오기
+        getInterval(0).removeMin();
+        T lastLeafMin = getInterval(lastIndex()).removeMin();
+        if (getInterval(lastIndex()).isEmpty()) {
+            elements.remove(lastIndex());
         }
-        elements.get(0).add(lastLeafMin);
+        getInterval(0).add(lastLeafMin);
 
-        // 자손들과 스왑
+        // 자손들과 구간 포함여부 확인하며 교환 반복
         int parentIndex = 0;
         while (true) {
-            if (parentIndex >= elements.size()) {
+            if (parentIndex >= size()) {
                 break;
             }
 
-            Interval<T> parent = elements.get(parentIndex);
+            Interval<T> parent = getInterval(parentIndex);
 
-            int leftChildIndex = parentIndex * 2 + 1;
-            int rightChildIndex = parentIndex * 2 + 2;
+            int[] childrenIndex = calcChildrenIndex(parentIndex);
+            int leftChildIndex = childrenIndex[0];
+            int rightChildIndex = childrenIndex[1];
 
-            Interval<T> leftChild = leftChildIndex < elements.size() ? elements.get(leftChildIndex) : null;
-            Interval<T> rightChild = rightChildIndex < elements.size() ? elements.get(rightChildIndex) : null;
+            Interval<T> leftChild = leftChildIndex < size() ? getInterval(leftChildIndex) : null;
+            Interval<T> rightChild = rightChildIndex < size() ? getInterval(rightChildIndex) : null;
 
             SwapChildrenResult result = parent.swapChildren(leftChild, rightChild);
             if (result == SwapChildrenResult.NONE) {
@@ -107,41 +121,44 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
     }
 
+    /**
+     * 최댓값을 제거한다.
+     */
     public void removeMax() {
-        if (elements.isEmpty()) {
+        if (isEmpty()) {
             return;
         }
 
-        if (elements.size() == 1) {
-            elements.get(0).removeMax();
-            if (elements.get(0).isEmpty()) {
+        if (size() == 1) {
+            getInterval(0).removeMax();
+            if (getInterval(0).isEmpty()) {
                 elements.remove(0);
             }
             return;
         }
 
-        // 루트 노드 max 값 제거 & 마지막 값 루트로 가져오기
-        elements.get(0).removeMax();
-        T lastLeafMax = elements.get(elements.size() - 1).removeMax();
-        if (elements.get(elements.size() - 1).isEmpty()) {
-            elements.remove(elements.size() - 1);
+        // 루트 노드 최댓값 제거 & 마지막 값 루트로 가져오기
+        getInterval(0).removeMax();
+        T lastLeafMax = getInterval(lastIndex()).removeMax();
+        if (getInterval(lastIndex()).isEmpty()) {
+            elements.remove(lastIndex());
         }
-        elements.get(0).add(lastLeafMax);
+        getInterval(0).add(lastLeafMax);
 
-        // 자손들과 스왑
+        // 자손들과 구간 포함여부 확인하며 교환 반복
         int parentIndex = 0;
         while (true) {
-            if (parentIndex >= elements.size()) {
+            if (parentIndex >= size()) {
                 break;
             }
 
-            Interval<T> parent = elements.get(parentIndex);
+            Interval<T> parent = getInterval(parentIndex);
+            int[] childrenIndex = calcChildrenIndex(parentIndex);
+            int leftChildIndex = childrenIndex[0];
+            int rightChildIndex = childrenIndex[1];
 
-            int leftChildIndex = parentIndex * 2 + 1;
-            int rightChildIndex = parentIndex * 2 + 2;
-
-            Interval<T> leftChild = leftChildIndex < elements.size() ? elements.get(leftChildIndex) : null;
-            Interval<T> rightChild = rightChildIndex < elements.size() ? elements.get(rightChildIndex) : null;
+            Interval<T> leftChild = leftChildIndex < size() ? getInterval(leftChildIndex) : null;
+            Interval<T> rightChild = rightChildIndex < size() ? getInterval(rightChildIndex) : null;
 
             SwapChildrenResult result = parent.swapChildren(leftChild, rightChild);
             if (result == SwapChildrenResult.NONE) {
@@ -152,6 +169,26 @@ public class IntervalHeap<T extends Comparable<T>> {
                 parentIndex = rightChildIndex;
             }
         }
+    }
+
+    private Interval<T> getInterval(int index) {
+        return elements.get(index);
+    }
+
+    private int size() {
+        return elements.size();
+    }
+
+    private int lastIndex() {
+        return size() - 1;
+    }
+
+    private static int[] calcChildrenIndex(int parentIndex) {
+        return new int[]{ parentIndex * 2 + 1, parentIndex * 2 + 2 };
+    }
+
+    private static int calcParentIndex(int childIndex) {
+        return childIndex % 2 == 1 ? childIndex / 2 : childIndex / 2 - 1;
     }
 
     private static class Interval<T extends Comparable<T>> {
