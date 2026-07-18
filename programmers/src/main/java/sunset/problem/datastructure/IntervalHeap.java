@@ -31,11 +31,11 @@ public class IntervalHeap<T extends Comparable<T>> {
             return Collections.emptyList();
         }
 
-        if (getInterval(0).isPoint()) {
-            return Collections.singletonList(getInterval(0).getPoint());
+        if (rootInterval().isPoint()) {
+            return Collections.singletonList(rootInterval().getPoint());
         }
 
-        return List.of(getInterval(0).getMin(), getInterval(0).getMax());
+        return List.of(rootInterval().getMin(), rootInterval().getMax());
     }
 
     /**
@@ -45,10 +45,10 @@ public class IntervalHeap<T extends Comparable<T>> {
      */
     public void add(T value) {
         // 마지막 노드에 값 추가
-        if (isEmpty() || getInterval(lastIndex()).isInterval()) {
+        if (isEmpty() || lastInterval().isInterval()) {
             elements.add(new Interval<>(value));
         } else {
-            getInterval(lastIndex()).add(value);
+            lastInterval().add(value);
         }
 
         // 선조들과 구간 포함여부 확인하며 교환 반복
@@ -90,39 +90,39 @@ public class IntervalHeap<T extends Comparable<T>> {
         }
 
         if (size() == 1) {
-            Interval<T> root = getInterval(0);
+            Interval<T> root = rootInterval();
             if (isMin) {
                 root.removeMin();
             } else {
                 root.removeMax();
             }
 
-            if (getInterval(0).isEmpty()) {
+            if (rootInterval().isEmpty()) {
                 elements.remove(0);
             }
             return;
         }
 
         // 루트 노드 값 제거 & 마지막 값 루트로 가져오기
-        Interval<T> root = getInterval(0);
+        Interval<T> root = rootInterval();
         if (isMin) {
             root.removeMin();
         } else {
             root.removeMax();
         }
 
-        Interval<T> lastLeaf = getInterval(lastIndex());
-        T lastLeafValue;
+        Interval<T> last = lastInterval();
+        T lastValue;
         if (isMin) {
-            lastLeafValue = lastLeaf.removeMin();
+            lastValue = last.removeMin();
         } else {
-            lastLeafValue = lastLeaf.removeMax();
+            lastValue = last.removeMax();
         }
 
-        if (getInterval(lastIndex()).isEmpty()) {
+        if (lastInterval().isEmpty()) {
             elements.remove(lastIndex());
         }
-        getInterval(0).add(lastLeafValue);
+        rootInterval().add(lastValue);
 
         // 자손들과 구간 포함여부 확인하며 교환 반복
         int parentIndex = 0;
@@ -149,6 +149,14 @@ public class IntervalHeap<T extends Comparable<T>> {
                 parentIndex = rightChildIndex;
             }
         }
+    }
+
+    private Interval<T> rootInterval() {
+        return getInterval(0);
+    }
+
+    private Interval<T> lastInterval() {
+        return getInterval(lastIndex());
     }
 
     private Interval<T> getInterval(int index) {
