@@ -5,6 +5,9 @@ import java.util.Map;
 
 public class P0208_ImplementTrie {}
 
+/**
+ * 결과: 41ms / 64.89MB
+ */
 class Trie {
 
     private final Node root;
