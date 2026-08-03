@@ -56,7 +56,6 @@ public class P0056_MergeIntervals {
         }
 
         private List<int[]> convertToSortedList(int[][] intervals) {
-            // TODO: 제대로 리스트로 변환되는지 확인
             return Arrays.stream(intervals)
                     .sorted(Comparator.comparingInt(a -> a[0]))
                     .collect(Collectors.toList());
